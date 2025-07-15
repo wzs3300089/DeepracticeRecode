@@ -1,0 +1,21 @@
+{
+  "name": "deepractice",
+  "version": "1.0.0",
+  "description": "这是 deepracticeX 项目的静态 HTML 复刻版本，专门用来记录直播文字内容的网站。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "esbuild js/main.js --bundle --outfile=dist/bundle.js --loader:.js=jsx",
+    "start": "npm run build -- --watch & serve"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@stagewise/toolbar": "^0.6.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.6",
+    "serve": "^14.2.4"
+  }
+}
