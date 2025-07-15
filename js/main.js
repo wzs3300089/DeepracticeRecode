@@ -1,10 +1,10 @@
-import { initToolbar } from '@stagewise/toolbar';
+// import { initToolbar } from '@stagewise/toolbar'; // 已屏蔽stagewise相关代码
 
 // Main JavaScript for Deepractice Static Site
 
-initToolbar({
-  plugins: [],
-});
+// initToolbar({
+//   plugins: [],
+// }); // 已屏蔽stagewise相关代码
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize smooth scrolling for anchor links
