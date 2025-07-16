@@ -1420,9 +1420,18 @@
             const currentHref = window.location.href;
             const currentPath = window.location.pathname;
 
-            // 使用绝对路径解决所有路径问题
-            // 无论如何访问，都使用从根目录开始的绝对路径
-            const jsPath = '/subsites/peta-os-website/script.js';
+            // 智能路径检测 - 支持本地开发和GitHub Pages部署
+            let jsPath;
+            if (currentHref.includes('github.io')) {
+                // GitHub Pages部署环境
+                jsPath = '/DeepracticeRecode/subsites/peta-os-website/script.js';
+            } else if (currentPath.includes('/subsites/peta-os-website/')) {
+                // 本地开发或直接访问subsites目录
+                jsPath = './script.js';
+            } else {
+                // 从根目录访问
+                jsPath = '/subsites/peta-os-website/script.js';
+            }
 
             // 动态创建JavaScript脚本
             const script = document.createElement('script');
