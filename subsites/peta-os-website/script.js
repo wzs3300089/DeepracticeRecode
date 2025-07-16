@@ -301,17 +301,14 @@ function initializeThemeToggle() {
     });
 }
 
-// 返回首页函数
+// 返回首页函数 - 参考7-10的正确实现
 function goBackHome() {
-    const currentPath = window.location.pathname;
-    const currentHost = window.location.origin;
-
-    // 使用绝对路径直接返回到根目录
-    // 无论当前在什么位置，都返回到网站根目录
-    window.location.href = '/index.html';
-
-    // 调试信息
-    //console.log('返回首页: 从', currentPath, '跳转到 /index.html');
+    const currentHref = window.location.href;
+    if (currentHref.includes('github.io')) {
+        window.location.href = '/DeepracticeRecode/';
+    } else {
+        window.location.href = '/';
+    }
 }
 
 // 修复返回首页链接路径（保留原函数以防需要）
