@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DPML提示词结构设计三大原则 - Deepractice 7月7日直播</title>
+    <script>
+        // 动态设置正确的CSS路径
+        (function() {
+            // 首先清除任何可能存在的错误CSS链接
+            const existingLinks = document.querySelectorAll('link[rel="stylesheet"]');
+            existingLinks.forEach(link => {
+                if (link.href.includes('styles.css') && !link.href.includes('/subsites/7-10/')) {
+                    console.warn('移除错误的CSS链接:', link.href);
+                    link.remove();
+                }
+            });
+
+            const currentHref = window.location.href;
+            const currentPath = window.location.pathname;
+
+            // 调试信息
+            console.log('Current href:', currentHref);
+            console.log('Current path:', currentPath);
+            console.log('Document location:', document.location);
+            console.log('Base URI:', document.baseURI);
+
+            // 智能路径检测 - 支持本地开发和GitHub Pages部署
+            let cssPath;
+            if (currentHref.includes('github.io')) {
+                // GitHub Pages部署环境
+                cssPath = '/DeepracticeRecode/subsites/7-10/styles.css';
+            } else if (currentPath.includes('/subsites/7-10/')) {
+                // 本地开发或直接访问subsites目录
+                cssPath = './styles.css';
+            } else {
+                // 从根目录访问
+                cssPath = '/subsites/7-10/styles.css';
+            }
+
+            console.log('CSS Path:', cssPath);
+            console.log('Full CSS URL will be:', new URL(cssPath, document.baseURI).href);
+
+            // 确保没有重复的CSS链接
+            const existingMainStyles = document.getElementById('main-styles');
+            if (existingMainStyles) {
+                existingMainStyles.remove();
+                console.log('移除已存在的main-styles链接');
+            }
+
+            // 动态创建CSS链接
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = cssPath;
+            link.id = 'main-styles';
+
+            // 添加加载状态监控
+            link.onload = function() {
+                console.log('✅ CSS加载成功:', cssPath);
+            };
+
+            link.onerror = function() {
+                console.error('❌ CSS加载失败:', cssPath);
+                console.error('尝试的完整URL:', new URL(cssPath, document.baseURI).href);
+            };
+
+            document.head.appendChild(link);
+            console.log('📤 CSS链接已添加到页面');
+
+            // 监控所有CSS请求
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'childList') {
+                        mutation.addedNodes.forEach(function(node) {
+                            if (node.tagName === 'LINK' && node.rel === 'stylesheet') {
+                                console.log('🔍 检测到新的CSS链接:', node.href);
+                                if (node.href.includes('styles.css') && !node.href.includes('/subsites/7-10/')) {
+                                    console.error('🚫 阻止错误的CSS请求:', node.href);
+                                    node.remove();
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+            observer.observe(document.head, { childList: true, subtree: true });
+
+            // 额外的路径测试
+            setTimeout(() => {
+                console.log('=== 路径测试 ===');
+                console.log('styles.css 存在性测试...');
+                fetch(cssPath)
+                    .then(response => {
+                        console.log('styles.css 响应状态:', response.status);
+                        if (response.ok) {
+                            console.log('✅ styles.css 可以访问');
+                        } else {
+                            console.log('❌ styles.css 访问失败，状态码:', response.status);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ styles.css 请求失败:', error);
+                    });
+            }, 100);
+        })();
+
+        // 返回首页函数
+        function goBackHome() {
+            const currentHref = window.location.href;
+            if (currentHref.includes('github.io')) {
+                window.location.href = '/DeepracticeRecode/';
+            } else {
+                window.location.href = '/';
+            }
+        }
+    </script>
+
+    <!-- 全局函数定义 -->
+    <script>
+        // 侧边栏切换功能
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                sidebar.classList.toggle('active');
+            }
+        }
+
+        // 平滑滚动到指定区块
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                const offsetTop = section.offsetTop - 80; // 考虑固定导航的高度
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth' // 平滑滚动
+                });
+
+                // 移动端关闭侧边栏
+                const sidebar = document.getElementById('sidebar');
+                if (window.innerWidth <= 1024 && sidebar) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        }
+
+        // 返回首页函数
+        function goBackHome() {
+            const currentHref = window.location.href;
+            if (currentHref.includes('github.io')) {
+                window.location.href = '/DeepracticeRecode/';
+            } else {
+                window.location.href = '/';
+            }
+        }
+
+        // 将函数添加到全局作用域
+        window.toggleSidebar = toggleSidebar;
+        window.scrollToSection = scrollToSection;
+        window.goBackHome = goBackHome;
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 左侧浮动导航 -->
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-code"></i>
+                <span>DPML</span>
+            </div>
+            <button id="sidebar-toggle" class="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <div class="sidebar-content">
+            <!-- 返回首页按钮 -->
+            <div class="back-to-home">
+                <a href="javascript:void(0)" class="back-home-btn" onclick="goBackHome()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>返回首页</span>
+                </a>
+            </div>
+
+            <ul class="nav-menu">
+                <li><a href="javascript:void(0)" class="nav-link active" data-section="hero">
+                    <i class="fas fa-home"></i>概述
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="dpml-intro">
+                    <i class="fas fa-info-circle"></i>DPML简介
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="design-philosophy">
+                    <i class="fas fa-lightbulb"></i>设计哲学
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="format-selection">
+                    <i class="fas fa-code-branch"></i>格式选型
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="three-principles">
+                    <i class="fas fa-list-ol"></i>三大原则
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="structuring">
+                    <i class="fas fa-sitemap"></i>结构化
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="consensus">
+                    <i class="fas fa-handshake"></i>基于共识
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="binding-not-restricting">
+                    <i class="fas fa-balance-scale"></i>约而不束
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="practice-cases">
+                    <i class="fas fa-rocket"></i>实践案例
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="ai-summary">
+                    <i class="fas fa-clipboard-list"></i>AI总结
+                </a></li>
+            </ul>
+        </div>
+        
+        <div class="sidebar-footer">
+            <div class="progress-indicator">
+                <div class="progress-bar" id="reading-progress"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 移动端返回首页浮动按钮 -->
+    <div class="mobile-back-home">
+        <a href="javascript:void(0)" class="mobile-back-btn" title="返回首页" onclick="goBackHome()">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+    <!-- 移动端菜单按钮 -->
+    <button class="mobile-menu-toggle" id="mobile-menu-toggle" title="打开菜单" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- 主内容区域 -->
+    <main class="main-content">
+        <!-- 英雄区域 -->
+        <section id="hero" class="hero-section">
+            <div class="hero-background">
+                <div class="neural-network"></div>
+            </div>
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>7月7日直播</span>
+                </div>
+                <h1 class="hero-title">
+                    <span class="gradient-text">DPML</span>
+                    <br>提示词结构设计三大原则
+                </h1>
+                <p class="hero-subtitle">
+                    深度解析让AI Agent告别混乱，走向专业化的设计哲学
+                </p>
+                <div class="hero-features">
+                    <div class="feature-item">
+                        <i class="fas fa-sitemap"></i>
+                        <span>结构化</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-handshake"></i>
+                        <span>基于共识</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-balance-scale"></i>
+                        <span>约而不束</span>
+                    </div>
+                </div>
+                <div class="hero-actions">
+                    <button class="btn btn-primary" onclick="scrollToSection('dpml-intro')">
+                        <i class="fas fa-play"></i>
+                        开始学习
+                    </button>
+                    <a href="https://www.bilibili.com/video/BV1jeGuzNE3n" target="_blank" class="btn btn-secondary">
+                        <i class="fas fa-video"></i>
+                        观看视频
+                    </a>
+                </div>
+                <div class="video-info">
+                    <i class="fas fa-clock"></i>
+                    <span>视频时长：约45分钟</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- DPML简介与设计起源 -->
+        <section id="dpml-intro" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">DPML简介</span>
+                    <h2>设计起源与本质</h2>
+                    <p>深度实践提示词标记语言的诞生背景</p>
+                    <div class="video-timestamp">
+                        <i class="fas fa-play-circle"></i>
+                        <a href="https://www.bilibili.com/video/BV1jeGuzNE3n?t=32" target="_blank">原片 @ 00:32</a>
+                    </div>
+                </div>
+
+                <div class="concept-grid">
+                    <div class="concept-card dpml-name">
+                        <div class="concept-icon">
+                            <i class="fas fa-tag"></i>
+                        </div>
+                        <h3>DPML 名称来源</h3>
+                        <div class="concept-definition">
+                            <div class="name-breakdown">
+                                <div class="name-part">
+                                    <strong>DP:</strong> <span class="highlight">Deepractice</span> (深度实践)
+                                    <p>社区和组织的名称，定位是 AI 应用与实践，与 DeepMind (深度求索) 的科研定位相区分</p>
+                                </div>
+                                <div class="name-part">
+                                    <strong>ML:</strong> <span class="highlight">Markup Language</span> (标记语言)
+                                    <p>强调其标记语言的本质特征</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="full-name">
+                            <strong>全称：</strong>Deepractice Prompt Markup Language<br>
+                            <em>深度实践提示词标记语言</em>
+                        </div>
+                    </div>
+
+                    <div class="concept-card dpml-essence">
+                        <div class="concept-icon">
+                            <i class="fas fa-dna"></i>
+                        </div>
+                        <h3>DPML 的本质</h3>
+                        <div class="concept-definition">
+                            <p><strong>核心特征：</strong>它是一种结构化内容的标记语言，类似于 HTML，而非一种编程语言</p>
+                        </div>
+                        <div class="concept-features">
+                            <div class="feature-tag">标记语言</div>
+                            <div class="feature-tag">结构化</div>
+                            <div class="feature-tag">非编程</div>
+                        </div>
+                        <div class="concept-purpose">
+                            <h4>设计初衷：</h4>
+                            <p>解决在 AI 应用开发中，随着项目推进，提示词数量剧增、难以管理的问题</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 核心设计哲学 -->
+        <section id="design-philosophy" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">设计哲学</span>
+                    <h2>人、计算机与 AI 的三方交互</h2>
+                    <p>传统编程语言的升级：从二方到三方的交互设计</p>
+                    <div class="video-timestamp">
+                        <i class="fas fa-play-circle"></i>
+                        <a href="https://www.bilibili.com/video/BV1jeGuzNE3n?t=346" target="_blank">原片 @ 05:46</a>
+                    </div>
+                </div>
+
+                <div class="philosophy-comparison">
+                    <div class="comparison-card traditional">
+                        <div class="comparison-header">
+                            <i class="fas fa-desktop"></i>
+                            <h3>传统编程语言</h3>
+                        </div>
+                        <div class="interaction-diagram">
+                            <div class="entity human">
+                                <i class="fas fa-user"></i>
+                                <span>人</span>
+                            </div>
+                            <div class="connection">↔</div>
+                            <div class="entity computer">
+                                <i class="fas fa-laptop"></i>
+                                <span>计算机</span>
+                            </div>
+                        </div>
+                        <p>主要考虑 <strong>人与计算机</strong> 的两方交互</p>
+                    </div>
+
+                    <div class="comparison-card ai-era">
+                        <div class="comparison-header">
+                            <i class="fas fa-brain"></i>
+                            <h3>AI 时代提示词</h3>
+                        </div>
+                        <div class="interaction-diagram three-way">
+                            <div class="entity human">
+                                <i class="fas fa-user"></i>
+                                <span>人</span>
+                            </div>
+                            <div class="bottom-entities">
+                                <div class="entity computer">
+                                    <i class="fas fa-laptop"></i>
+                                    <span>计算机</span>
+                                </div>
+                                <div class="entity ai">
+                                    <i class="fas fa-robot"></i>
+                                    <span>AI</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p>需要考虑 <strong>人、计算机、AI</strong> 的三方交互</p>
+                    </div>
+                </div>
+
+                <div class="three-requirements">
+                    <div class="requirement-card human-friendly">
+                        <div class="requirement-icon">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <h3>对人友好</h3>
+                        <p>提示词必须易于人类阅读、理解和编写。如果比写代码还复杂，就失去了其意义。</p>
+                        <div class="requirement-features">
+                            <span class="feature">易读</span>
+                            <span class="feature">易懂</span>
+                            <span class="feature">易写</span>
+                        </div>
+                    </div>
+
+                    <div class="requirement-card computer-friendly">
+                        <div class="requirement-icon">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        <h3>对计算机友好</h3>
+                        <p>结构化的提示词需要能被计算机程序解析和处理，以实现自动化和集成。</p>
+                        <div class="requirement-features">
+                            <span class="feature">可解析</span>
+                            <span class="feature">可处理</span>
+                            <span class="feature">可集成</span>
+                        </div>
+                    </div>
+
+                    <div class="requirement-card ai-friendly">
+                        <div class="requirement-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3>对 AI 友好</h3>
+                        <p>AI 需要能准确理解提示词的意图。幸运的是，AI 兼具计算机的效率和对自然语言的理解能力，是最容易"将就"的一方。</p>
+                        <div class="requirement-features">
+                            <span class="feature">理解准确</span>
+                            <span class="feature">执行高效</span>
+                            <span class="feature">适应性强</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="design-core">
+                    <div class="core-principle">
+                        <i class="fas fa-bullseye"></i>
+                        <h3>设计核心</h3>
+                        <p>在利用 AI 自然语言能力的同时，提供一个对人和计算机都足够清晰的结构。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 提示词格式选型 -->
+        <section id="format-selection" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">格式选型</span>
+                    <h2>为何选择类 XML 结构？</h2>
+                    <p>在确定设计哲学后，对市面上现有格式的评估和选择</p>
+                    <div class="video-timestamp">
+                        <i class="fas fa-play-circle"></i>
+                        <a href="https://www.bilibili.com/video/BV1jeGuzNE3n?t=476" target="_blank">原片 @ 07:56</a>
+                    </div>
+                </div>
+
+                <div class="format-comparison">
+                    <div class="format-card json-format rejected">
+                        <div class="format-header">
+                            <i class="fab fa-js-square"></i>
+                            <h3>JSON</h3>
+                            <span class="status-badge rejected">不合适</span>
+                        </div>
+                        <div class="format-content">
+                            <div class="disadvantages">
+                                <h4><i class="fas fa-times-circle"></i> 缺点：</h4>
+                                <ul>
+                                    <li>对人类的可读性和编写体验极差</li>
+                                    <li>格式要求严格（如引号、逗号）</li>
+                                    <li>不适合快速编写和阅读</li>
+                                    <li>纯粹是为计算机设计的</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="format-example">
+                            <pre><code>{
+  "role": "assistant",
+  "skills": ["coding", "analysis"],
+  "personality": "helpful"
+}</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="format-card yaml-format partial">
+                        <div class="format-header">
+                            <i class="fas fa-file-code"></i>
+                            <h3>YAML</h3>
+                            <span class="status-badge partial">不够理想</span>
+                        </div>
+                        <div class="format-content">
+                            <div class="advantages">
+                                <h4><i class="fas fa-check-circle"></i> 优点：</h4>
+                                <ul>
+                                    <li>相比 JSON，对人类更友好</li>
+                                    <li>编写更简洁</li>
+                                </ul>
+                            </div>
+                            <div class="disadvantages">
+                                <h4><i class="fas fa-times-circle"></i> 缺点：</h4>
+                                <ul>
+                                    <li>在表达丰富的语义和层级关系时，其结构不如 XML 直观和强大</li>
+                                    <li>表达同一个意思可能需要更多行代码，消耗更多 Token</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="format-example">
+                            <pre><code>role: assistant
+skills:
+  - coding
+  - analysis
+personality: helpful</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="format-card xml-format selected">
+                        <div class="format-header">
+                            <i class="fas fa-code"></i>
+                            <h3>类 XML/HTML 结构</h3>
+                            <span class="status-badge selected">最终选择</span>
+                        </div>
+                        <div class="format-content">
+                            <div class="advantages">
+                                <h4><i class="fas fa-check-circle"></i> 优点：</h4>
+                                <p><strong>语义表达能力非常丰富和高效</strong></p>
+                                <p>一个 XML 标签天然包含三个层次的语义：</p>
+                            </div>
+                        </div>
+                        <div class="format-example">
+                            <pre><code>&lt;role&gt;
+  &lt;skill name="coding"&gt;编程能力&lt;/skill&gt;
+  &lt;personality&gt;helpful&lt;/personality&gt;
+&lt;/role&gt;</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="xml-semantic-layers">
+                    <h3>XML 标签的三段式语义结构</h3>
+                    <div class="semantic-grid">
+                        <div class="semantic-layer">
+                            <div class="layer-number">1</div>
+                            <div class="layer-content">
+                                <h4>标签名 (Tag Name)</h4>
+                                <p>如 <code>&lt;role&gt;</code>，本身就定义了内容的<strong>核心语义</strong>和<strong>作用域</strong>，具有很强的概括性</p>
+                                <div class="example">
+                                    <code>&lt;role&gt;</code> → 角色定义
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="semantic-layer">
+                            <div class="layer-number">2</div>
+                            <div class="layer-content">
+                                <h4>属性 (Attributes)</h4>
+                                <p>如 <code>&lt;skill name="coding"&gt;</code>，可以用来表达<strong>组合关系</strong>、<strong>元数据</strong>或配置，增加了信息维度</p>
+                                <div class="example">
+                                    <code>name="coding"→ 技能类型</code> 
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="semantic-layer">
+                            <div class="layer-number">3</div>
+                            <div class="layer-content">
+                                <h4>内容 (Content)</h4>
+                                <p>标签内部的文本或子标签，用于承载具体的<strong>逻辑</strong>、数据和描述</p>
+                                <div class="example">
+                                    <code>编程能力</code> → 具体描述
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="conclusion">
+                        <div class="conclusion-content">
+                            <i class="fas fa-lightbulb"></i>
+                            <h4>结论</h4>
+                            <p>这种三段式结构能高效地表达父子、组合、并行等复杂关系，且结构清晰，符合三方交互的设计哲学。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 提示词结构设计三大原则 -->
+        <section id="three-principles" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">核心原则</span>
+                    <h2>提示词结构设计三大原则</h2>
+                    <p>基于设计哲学和格式选型，总结出的核心设计原则</p>
+                    <div class="video-timestamp">
+                        <i class="fas fa-play-circle"></i>
+                        <a href="https://www.bilibili.com/video/BV1jeGuzNE3n?t=1153" target="_blank">原片 @ 19:13</a>
+                    </div>
+                </div>
+
+                <div class="principles-overview">
+                    <div class="principle-card principle-1">
+                        <div class="principle-number">1</div>
+                        <div class="principle-content">
+                            <h3>结构化 (Structuring)</h3>
+                            <p>使用标签将提示词内容进行模块化和分块</p>
+                            <div class="principle-icon">
+                                <i class="fas fa-sitemap"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="principle-card principle-2">
+                        <div class="principle-number">2</div>
+                        <div class="principle-content">
+                            <h3>基于共识 (Based on Consensus)</h3>
+                            <p>使用人类社会已有的、广泛理解的概念</p>
+                            <div class="principle-icon">
+                                <i class="fas fa-handshake"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="principle-card principle-3">
+                        <div class="principle-number">3</div>
+                        <div class="principle-content">
+                            <h3>约而不束 (Binding without Restricting)</h3>
+                            <p>完美平衡结构化与灵活性</p>
+                            <div class="principle-icon">
+                                <i class="fas fa-balance-scale"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 原则一：结构化 -->
+        <section id="structuring" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">原则一</span>
+                    <h2>结构化 (Structuring)</h2>
+                    <p>使用标签将提示词内容进行模块化和分块</p>
+                </div>
+
+                <div class="principle-detail">
+                    <div class="core-idea">
+                        <div class="idea-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div class="idea-content">
+                            <h3>核心思想</h3>
+                            <p>使用标签（如 <code>&lt;role&gt;</code>, <code>&lt;personality&gt;</code>, <code>&lt;skill&gt;</code>）将提示词内容进行模块化和分块。</p>
+                        </div>
+                    </div>
+
+                    <div class="purpose-benefits">
+                        <h3>目的与好处</h3>
+                        <div class="benefits-grid">
+                            <div class="benefit-card">
+                                <div class="benefit-icon">
+                                    <i class="fas fa-border-style"></i>
+                                </div>
+                                <h4>限定范围</h4>
+                                <p>像一个框架或"框"，约束 AI 在指定的范围内思考和生成内容，避免其"胡言乱语"。</p>
+                            </div>
+
+                            <div class="benefit-card">
+                                <div class="benefit-icon">
+                                    <i class="fas fa-cube"></i>
+                                </div>
+                                <h4>抽象与易于理解</h4>
+                                <p>类似于面向对象编程（OOP）中的类 (Class)，将相关信息组织在一起，使提示词的逻辑更清晰，易于人类理解和维护。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="structuring-example">
+                        <h3>结构化示例</h3>
+                        <div class="example-comparison">
+                            <div class="example-before">
+                                <h4><i class="fas fa-times"></i> 未结构化</h4>
+                                <pre><code>你是一个助手，性格友好，擅长编程和分析，
+请帮我解决问题...</code></pre>
+                            </div>
+                            <div class="example-after">
+                                <h4><i class="fas fa-check"></i> 结构化</h4>
+                                <pre><code>&lt;role&gt;助手&lt;/role&gt;
+&lt;personality&gt;友好&lt;/personality&gt;
+&lt;skill&gt;
+  &lt;item&gt;编程&lt;/item&gt;
+  &lt;item&gt;分析&lt;/item&gt;
+&lt;/skill&gt;
+&lt;task&gt;请帮我解决问题...&lt;/task&gt;</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="oop-analogy">
+                        <div class="analogy-content">
+                            <i class="fas fa-code"></i>
+                            <h3>面向对象编程类比</h3>
+                            <p>将所有"人格"相关的描述放在 <code>&lt;personality&gt;</code> 标签内，就像 OOP 中将相关属性和方法封装在一个类中一样。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 原则二：基于共识 -->
+        <section id="consensus" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">原则二</span>
+                    <h2>基于共识 (Based on Consensus)</h2>
+                    <p>使用人类社会已有的、广泛理解的概念，而非自创术语</p>
+                    <div class="video-timestamp">
+                        <i class="fas fa-play-circle"></i>
+                        <a href="https://www.bilibili.com/video/BV1jeGuzNE3n?t=1426" target="_blank">原片 @ 23:46</a>
+                    </div>
+                </div>
+
+                <div class="principle-detail">
+                    <div class="core-idea">
+                        <div class="idea-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <div class="idea-content">
+                            <h3>核心思想</h3>
+                            <p>在设计提示词的结构和用词时，要尽量使用人类社会、文化和知识体系中已经存在的、被广泛理解的概念，而不是自己创造新词。</p>
+                        </div>
+                    </div>
+
+                    <div class="why-important">
+                        <h3>为什么重要？</h3>
+                        <div class="importance-grid">
+                            <div class="importance-card">
+                                <div class="importance-icon">
+                                    <i class="fas fa-brain"></i>
+                                </div>
+                                <h4>AI 训练基础</h4>
+                                <p>AI 的知识来源于对海量人类文本的训练，因此，人类容易理解的、约定俗成的概念，AI 也更容易理解。</p>
+                            </div>
+
+                            <div class="importance-card">
+                                <div class="importance-icon">
+                                    <i class="fas fa-coins"></i>
+                                </div>
+                                <h4>节省 Token</h4>
+                                <p>使用共识词汇可以省去大量的解释性文字，从而节省 Token 并提高 AI 理解的准确性。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="practical-applications">
+                        <h3>实践应用</h3>
+                        <div class="application-grid">
+                            <div class="application-card naming">
+                                <div class="application-header">
+                                    <div class="application-icon">
+                                        <i class="fas fa-tag"></i>
+                                    </div>
+                                    <h4>命名</h4>
+                                </div>
+                                <p>给工具或角色命名时，使用具有文化共识的名字（如"女娲"代表创造）能让用户瞬间理解其核心功能。</p>
+                                <div class="example">
+                                    <strong>示例：</strong>"女娲" → 创造、生成
+                                </div>
+                            </div>
+
+                            <div class="application-card vocabulary">
+                                <div class="application-header">
+                                    <div class="application-icon">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <h4>词汇选择</h4>
+                                </div>
+                                <p>使用"关键词 (Keywords)"或"标签 (Tags)"这种大众词汇，而不是"高熵词汇 (high-entropy vocabulary)"这类专业术语。</p>
+                                <div class="example">
+                                    <strong>推荐：</strong>Exploration, Reasoning<br>
+                                    <strong>避免：</strong>自创的复杂术语
+                                </div>
+                            </div>
+
+                            <div class="application-card product-design">
+                                <div class="application-header">
+                                    <div class="application-icon">
+                                        <i class="fas fa-rocket"></i>
+                                    </div>
+                                    <h4>产品设计</h4>
+                                </div>
+                                <p>产品的成功很大程度上依赖于能否与用户的既有认知（共识）相结合。</p>
+                                <div class="example">
+                                    <strong>成功案例：</strong>Prompt X 项目在接入了用户熟知的 MCP 后获得了快速增长
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="consensus-examples">
+                        <h3>共识词汇示例</h3>
+                        <div class="examples-grid">
+                            <div class="example-category cultural">
+                                <h4><i class="fas fa-globe"></i> 文化共识</h4>
+                                <div class="example-items">
+                                    <span class="example-item">女娲 → 创造</span>
+                                    <span class="example-item">孙悟空 → 机智</span>
+                                    <span class="example-item">诸葛亮 → 智慧</span>
+                                </div>
+                            </div>
+
+                            <div class="example-category technical">
+                                <h4><i class="fas fa-cog"></i> 技术共识</h4>
+                                <div class="example-items">
+                                    <span class="example-item">Keywords → 关键词</span>
+                                    <span class="example-item">Tags → 标签</span>
+                                    <span class="example-item">Exploration → 探索</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 原则三：约而不束 -->
+        <section id="binding-not-restricting" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">原则三</span>
+                    <h2>约而不束 (Binding without Restricting)</h2>
+                    <p>前两个原则的升华，完美平衡结构化与灵活性</p>
+                    <div class="video-timestamp">
+                        <i class="fas fa-play-circle"></i>
+                        <a href="https://www.bilibili.com/video/BV1jeGuzNE3n?t=2128" target="_blank">原片 @ 35:28</a>
+                    </div>
+                </div>
+
+                <div class="principle-detail">
+                    <div class="principle-essence">
+                        <div class="essence-icon">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <div class="essence-content">
+                            <h3>原则精髓</h3>
+                            <p>这个原则是前两个原则的升华，完美平衡了结构化与灵活性。</p>
+                        </div>
+                    </div>
+
+                    <div class="binding-not-restricting-breakdown">
+                        <div class="concept-grid">
+                            <div class="concept-card binding">
+                                <div class="concept-header">
+                                    <i class="fas fa-link"></i>
+                                    <h3>"约" (Binding/Agreement)</h3>
+                                </div>
+                                <div class="concept-content">
+                                    <p>指的是通过<strong>结构化标签</strong>和<strong>基于共识的命名</strong>来创建清晰的<strong>约定</strong>。</p>
+                                    <div class="purpose">
+                                        <h4>作用：</h4>
+                                        <ul>
+                                            <li>给计算机解析和人类快速理解框架用的</li>
+                                            <li>定义了"什么是什么"</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="concept-example">
+                                    <h4>示例：</h4>
+                                    <pre><code>&lt;role&gt;...&lt;/role&gt;
+&lt;skill&gt;...&lt;/skill&gt;
+&lt;personality&gt;...&lt;/personality&gt;</code></pre>
+                                </div>
+                            </div>
+
+                            <div class="concept-card not-restricting">
+                                <div class="concept-header">
+                                    <i class="fas fa-unlock"></i>
+                                    <h3>"不束" (Without Restricting)</h3>
+                                </div>
+                                <div class="concept-content">
+                                    <p>指的是在标签的<strong>内容区域 (Content)</strong> 内，<strong>不施加严格的语法束缚</strong>。</p>
+                                    <div class="purpose">
+                                        <h4>特点：</h4>
+                                        <ul>
+                                            <li>这部分内容可以直接交给 AI 处理</li>
+                                            <li>充分发挥其强大的自然语言理解能力</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="content-types">
+                                    <h4>内容可以是：</h4>
+                                    <div class="content-type-grid">
+                                        <span class="content-type">自然语言描述</span>
+                                        <span class="content-type">Markdown 格式</span>
+                                        <span class="content-type">Mermaid 图表代码</span>
+                                        <span class="content-type">另一段 XML 代码</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="why-not-restricting">
+                        <h3>为什么"不束"很重要？</h3>
+                        <div class="importance-grid">
+                            <div class="importance-card avoid-over-design">
+                                <div class="importance-icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <h4>避免过度设计</h4>
+                                <p>如果试图用 XML 标签去实现复杂的 if/else 逻辑，会变得非常笨重和低效。</p>
+                            </div>
+
+                            <div class="importance-card natural-language-strength">
+                                <div class="importance-icon">
+                                    <i class="fas fa-comments"></i>
+                                </div>
+                                <h4>发挥自然语言优势</h4>
+                                <p>逻辑表达是自然语言的强项。我们应该用自然语言去描述逻辑，而不是发明一套新的、死板的规则去约束 AI。</p>
+                            </div>
+
+                            <div class="importance-card attention-resource">
+                                <div class="importance-icon">
+                                    <i class="fas fa-brain"></i>
+                                </div>
+                                <h4>保护注意力资源</h4>
+                                <p>过多的、死板的规则（如复杂的 JSON 结构）会消耗 AI 宝贵的"注意力"资源，反而可能导致它在核心任务上出错。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="balance-example">
+                        <h3>平衡示例</h3>
+                        <div class="example-container">
+                            <div class="example-good">
+                                <h4><i class="fas fa-check-circle"></i> 约而不束的好例子</h4>
+                                <pre><code>&lt;role&gt;
+你是一个专业的编程助手，具有以下特点：
+- 擅长多种编程语言
+- 能够提供清晰的代码解释
+- 遇到复杂问题时会分步骤解决
+
+请根据用户的需求，提供最合适的解决方案。
+如果需要，可以询问更多细节来确保准确性。
+&lt;/role&gt;</code></pre>
+                            </div>
+                            <div class="example-bad">
+                                <h4><i class="fas fa-times-circle"></i> 过度束缚的坏例子</h4>
+                                <pre><code>&lt;role&gt;
+  &lt;type&gt;assistant&lt;/type&gt;
+  &lt;domain&gt;programming&lt;/domain&gt;
+  &lt;if condition="user_asks_question"&gt;
+    &lt;then&gt;provide_answer&lt;/then&gt;
+    &lt;else&gt;ask_clarification&lt;/else&gt;
+  &lt;/if&gt;
+&lt;/role&gt;</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 实践案例与社区理念 -->
+        <section id="practice-cases" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">实践案例</span>
+                    <h2>实践案例与社区理念</h2>
+                    <p>DPML设计原则的成功实践和社区愿景</p>
+                    <div class="video-timestamp">
+                        <i class="fas fa-play-circle"></i>
+                        <a href="https://www.bilibili.com/video/BV1jeGuzNE3n?t=2542" target="_blank">原片 @ 42:22</a>
+                    </div>
+                </div>
+
+                <div class="practice-content">
+                    <div class="inspiration-case">
+                        <div class="case-header">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>Mermaid 的启发</h3>
+                        </div>
+                        <div class="case-content">
+                            <p><strong>Mermaid</strong> 也是"约而不束"的典范。它有简单的语法（约），但能生成丰富的可视化图表，同时被人类、计算机和 AI 很好地理解。</p>
+                            <div class="mermaid-example">
+                                <h4>Mermaid 示例：</h4>
+                                <pre><code>graph TD
+    A[开始] --> B{是否理解?}
+    B -->|是| C[继续学习]
+    B -->|否| D[重新阅读]
+    D --> B</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="success-project">
+                        <div class="project-header">
+                            <i class="fas fa-star"></i>
+                            <h3>成功项目 Prompt X</h3>
+                        </div>
+                        <div class="project-content">
+                            <div class="project-stats">
+                                <div class="stat-item">
+                                    <div class="stat-number">1.8k</div>
+                                    <div class="stat-label">GitHub Stars</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">1</div>
+                                    <div class="stat-label">月内获得</div>
+                                </div>
+                            </div>
+                            <div class="project-features">
+                                <h4>项目特点：</h4>
+                                <ul>
+                                    <li>社区的 Prompt X 开源项目是这套设计原则的成功实践</li>
+                                    <li>项目的 README 优先使用中文，降低国内用户的使用门槛</li>
+                                    <li>这也是"基于共识"的一种体现</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="community-vision">
+                        <div class="vision-header">
+                            <i class="fas fa-users"></i>
+                            <h3>社区愿景</h3>
+                        </div>
+                        <div class="vision-content">
+                            <div class="vision-grid">
+                                <div class="vision-card accessibility">
+                                    <div class="vision-icon">
+                                        <i class="fas fa-hand-holding-heart"></i>
+                                    </div>
+                                    <h4>让AI触手可及</h4>
+                                    <p>致力于将 AI 应用做得足够简单，让普通人、小白用户也能轻松使用，就像抖音让老人也能享受互联网一样。</p>
+                                </div>
+
+                                <div class="vision-card community-driven">
+                                    <div class="vision-icon">
+                                        <i class="fas fa-vote-yea"></i>
+                                    </div>
+                                    <h4>社区驱动</h4>
+                                    <p>项目的发展由社区共同决策，非常重视用户反馈，即使只有一个用户的需求，只要合理也会考虑实现。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI总结 -->
+        <section id="ai-summary" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">总结</span>
+                    <h2>AI 总结</h2>
+                    <p>DPML设计原则的核心要点和价值</p>
+                </div>
+
+                <div class="summary-content">
+                    <div class="summary-intro">
+                        <p>本次分享深入剖析了 <strong>DPML</strong> (Deepractice Prompt Markup Language) 的三大核心设计原则，旨在构建专业、高效且易于维护的 AI Agent 提示词体系。</p>
+                    </div>
+
+                    <div class="summary-principles">
+                        <div class="summary-principle">
+                            <div class="principle-number">1</div>
+                            <div class="principle-content">
+                                <h3>结构化 (Structuring)</h3>
+                                <p>采用类 XML 的标签体系，将提示词内容模块化，为 AI 的思考和输出提供清晰的框架，防止其偏离主题。</p>
+                            </div>
+                        </div>
+
+                        <div class="summary-principle">
+                            <div class="principle-number">2</div>
+                            <div class="principle-content">
+                                <h3>基于共识 (Based on Consensus)</h3>
+                                <p>强调使用人类社会已有的、广泛理解的词汇和概念，而非自创术语。这能有效利用 AI 基于人类知识的训练背景，减少不必要的解释，节省 Token 并提升沟通效率。</p>
+                            </div>
+                        </div>
+
+                        <div class="summary-principle">
+                            <div class="principle-number">3</div>
+                            <div class="principle-content">
+                                <h3>约而不束 (Binding without Restricting)</h3>
+                                <p>这一核心原则巧妙地平衡了刚性与柔性。通过标签实现结构化的"约定"，但在标签内部则"不束缚"，允许使用自然语言、Markdown 等灵活形式来描述复杂逻辑，充分发挥 AI 的自然语言理解优势，避免过度工程化。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="summary-conclusion">
+                        <div class="conclusion-content">
+                            <i class="fas fa-target"></i>
+                            <h3>最终目标</h3>
+                            <p>这些原则共同构成了一套旨在优化 <strong>人、计算机、AI</strong> 三方交互的系统性方法论，其最终目标是让 AI 应用的开发和使用变得更加简单、直观和普及。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // 动态设置正确的JS路径并加载
+        (function() {
+            const currentHref = window.location.href;
+            const currentPath = window.location.pathname;
+
+            let jsPath;
+            if (currentHref.includes('github.io')) {
+                jsPath = '/DeepracticeRecode/subsites/7-10/script.js';
+            } else if (currentPath.includes('/subsites/7-10/')) {
+                jsPath = './script.js';
+            } else {
+                jsPath = '/subsites/7-10/script.js';
+            }
+
+            // 动态创建JavaScript脚本
+            const script = document.createElement('script');
+            script.src = jsPath;
+            document.body.appendChild(script);
+
+            console.log('JS path:', jsPath);
+        })();
+    </script>
+</body>
+</html>

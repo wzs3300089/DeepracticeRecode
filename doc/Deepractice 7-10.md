@@ -1,4 +1,4 @@
-# Deepractice 提示词结构设计三大原则深度解析
+# Deepractice 7月10日直播 _ DPML提示词结构设计三大原则深度解析！让AI Agent告别混乱，走向专业化
 
 ## 目录
 - [DPML 简介与设计起源](#dpml-简介与设计起源-content-00:32)
