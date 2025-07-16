@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PETA-OS - 全球首个AI认知记忆系统</title>
+    <script>
+        // 动态设置正确的CSS路径
+        (function() {
+            // 首先清除任何可能存在的错误CSS链接
+            const existingLinks = document.querySelectorAll('link[rel="stylesheet"]');
+            existingLinks.forEach(link => {
+                if (link.href.includes('styles.css') && !link.href.includes('/subsites/peta-os-website/')) {
+                    console.warn('移除错误的CSS链接:', link.href);
+                    link.remove();
+                }
+            });
+
+            const currentHref = window.location.href;
+            const currentPath = window.location.pathname;
+
+            // 调试信息
+            console.log('Current href:', currentHref);
+            console.log('Current path:', currentPath);
+            console.log('Document location:', document.location);
+            console.log('Base URI:', document.baseURI);
+
+            // 使用绝对路径解决所有路径问题
+            // 无论如何访问，都使用从根目录开始的绝对路径
+            const cssPath = '/subsites/peta-os-website/styles.css';
+
+            console.log('CSS Path:', cssPath);
+            console.log('Full CSS URL will be:', new URL(cssPath, document.baseURI).href);
+
+            // 确保没有重复的CSS链接
+            const existingMainStyles = document.getElementById('main-styles');
+            if (existingMainStyles) {
+                existingMainStyles.remove();
+                console.log('移除已存在的main-styles链接');
+            }
+
+            // 动态创建CSS链接
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = cssPath;
+            link.id = 'main-styles';
+
+            // 添加加载状态监控
+            link.onload = function() {
+                console.log('✅ CSS加载成功:', cssPath);
+            };
+
+            link.onerror = function() {
+                console.error('❌ CSS加载失败:', cssPath);
+                console.error('尝试的完整URL:', new URL(cssPath, document.baseURI).href);
+            };
+
+            document.head.appendChild(link);
+            console.log('📤 CSS链接已添加到页面');
+
+            // 监控所有CSS请求
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'childList') {
+                        mutation.addedNodes.forEach(function(node) {
+                            if (node.tagName === 'LINK' && node.rel === 'stylesheet') {
+                                console.log('🔍 检测到新的CSS链接:', node.href);
+                                if (node.href.includes('styles.css') && !node.href.includes('/subsites/peta-os-website/')) {
+                                    console.error('🚫 阻止错误的CSS请求:', node.href);
+                                    node.remove();
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+            observer.observe(document.head, { childList: true, subtree: true });
+
+            // 额外的路径测试
+            setTimeout(() => {
+                console.log('=== 路径测试 ===');
+                console.log('styles.css 存在性测试...');
+                fetch(cssPath)
+                    .then(response => {
+                        console.log('styles.css 响应状态:', response.status);
+                        if (response.ok) {
+                            console.log('✅ styles.css 可以访问');
+                        } else {
+                            console.log('❌ styles.css 访问失败，状态码:', response.status);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ styles.css 网络错误:', error);
+                    });
+            }, 100);
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 左侧浮动导航 -->
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-brain"></i>
+                <span>PETA-OS</span>
+            </div>
+            <button id="sidebar-toggle" class="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <div class="sidebar-content">
+            <!-- 返回首页按钮 -->
+            <div class="back-to-home">
+                <a href="#" class="back-home-btn" onclick="goBackHome()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>返回首页</span>
+                </a>
+            </div>
+
+            <ul class="nav-menu">
+                <li><a href="#hero" class="nav-link active" data-section="hero">
+                    <i class="fas fa-home"></i>概述
+                </a></li>
+                <li><a href="#core-concepts" class="nav-link" data-section="core-concepts">
+                    <i class="fas fa-cube"></i>核心概念
+                </a></li>
+                <li><a href="#peta-os-engine" class="nav-link" data-section="peta-os-engine">
+                    <i class="fas fa-cogs"></i>状态化引擎
+                </a></li>
+                <li><a href="#rag-criticism" class="nav-link" data-section="rag-criticism">
+                    <i class="fas fa-exclamation-triangle"></i>RAG批判
+                </a></li>
+                <li><a href="#memory-system" class="nav-link" data-section="memory-system">
+                    <i class="fas fa-database"></i>记忆系统
+                </a></li>
+                <li><a href="#system-demo" class="nav-link" data-section="system-demo">
+                    <i class="fas fa-play-circle"></i>系统演示
+                </a></li>
+                <li><a href="#advanced-concepts" class="nav-link" data-section="advanced-concepts">
+                    <i class="fas fa-graduation-cap"></i>高级概念
+                </a></li>
+                <li><a href="#summary" class="nav-link" data-section="summary">
+                    <i class="fas fa-clipboard-list"></i>总结
+                </a></li>
+            </ul>
+        </div>
+        
+        <div class="sidebar-footer">
+            <div class="progress-indicator">
+                <div class="progress-bar" id="reading-progress"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 移动端返回首页浮动按钮 -->
+    <div class="mobile-back-home">
+        <a href="#" class="mobile-back-btn" title="返回首页" onclick="goBackHome()">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+    <!-- 主内容区域 -->
+    <main class="main-content">
+        <!-- 英雄区域 -->
+        <section id="hero" class="hero-section">
+            <div class="hero-background">
+                <div class="neural-network"></div>
+            </div>
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-rocket"></i>
+                    <span>全球首发</span>
+                </div>
+                <h1 class="hero-title">
+                    <span class="gradient-text">PETA-OS</span>
+                    <br>AI认知记忆系统
+                </h1>
+                <p class="hero-subtitle">
+                    让智能体像人一样思考、记忆、成长的革命性架构
+                </p>
+                <div class="hero-features">
+                    <div class="feature-item">
+                        <i class="fas fa-brain"></i>
+                        <span>认知心理学</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-memory"></i>
+                        <span>精确记忆</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>持续成长</span>
+                    </div>
+                </div>
+                <div class="hero-actions">
+                    <button class="btn btn-primary" onclick="scrollToSection('core-concepts')">
+                        <i class="fas fa-play"></i>
+                        开始探索
+                    </button>
+                    <button class="btn btn-secondary" onclick="scrollToSection('system-demo')">
+                        <i class="fas fa-eye"></i>
+                        观看演示
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 核心概念 -->
+        <section id="core-concepts" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">核心理念</span>
+                    <h2>结构化与状态化</h2>
+                    <p>理解世界和构建复杂系统的两种基本哲学</p>
+                </div>
+
+                <div class="concept-grid">
+                    <div class="concept-card structuring">
+                        <div class="concept-icon">
+                            <i class="fas fa-sitemap"></i>
+                        </div>
+                        <h3>结构化 (Structuring)</h3>
+                        <div class="concept-definition">
+                            <p><strong>定义：</strong>指代静态、固定的事物，是一种分类和规整的方式</p>
+                        </div>
+                        <div class="concept-features">
+                            <div class="feature-tag">静态</div>
+                            <div class="feature-tag">固定</div>
+                            <div class="feature-tag">分类</div>
+                        </div>
+                        <div class="concept-examples">
+                            <h4>示例：</h4>
+                            <ul>
+                                <li><i class="fas fa-code"></i>代码中的类型定义</li>
+                                <li><i class="fas fa-building"></i>公司的组织架构</li>
+                                <li><i class="fas fa-user-tie"></i>员工的职位</li>
+                            </ul>
+                        </div>
+                        <div class="concept-purpose">
+                            <strong>目的：</strong>通过分类和规整实现复用，避免重复劳动
+                        </div>
+                    </div>
+
+                    <div class="concept-card stateful">
+                        <div class="concept-icon">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <h3>状态化 (Stateful)</h3>
+                        <div class="concept-definition">
+                            <p><strong>定义：</strong>指代动态的过程，描述事物从开始到结束的变化流程</p>
+                        </div>
+                        <div class="concept-features">
+                            <div class="feature-tag">动态</div>
+                            <div class="feature-tag">过程化</div>
+                            <div class="feature-tag">有层次</div>
+                        </div>
+                        <div class="concept-examples">
+                            <h4>示例：</h4>
+                            <ul>
+                                <li><i class="fas fa-code-branch"></i>过程式编程</li>
+                                <li><i class="fas fa-route"></i>业务流程流转</li>
+                                <li><i class="fas fa-tasks"></i>任务执行过程</li>
+                            </ul>
+                        </div>
+                        <div class="concept-purpose">
+                            <strong>核心：</strong>状态化是执行工作的核心，让AI执行复杂业务
+                        </div>
+                    </div>
+                </div>
+
+                <div class="state-components">
+                    <h3>状态的完整组成</h3>
+                    <div class="state-diagram">
+                        <div class="state-item">
+                            <div class="state-icon initial">
+                                <i class="fas fa-play"></i>
+                            </div>
+                            <span>初始状态</span>
+                        </div>
+                        <div class="state-arrow">→</div>
+                        <div class="state-item">
+                            <div class="state-icon transition">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <span>转换/反应</span>
+                        </div>
+                        <div class="state-arrow">→</div>
+                        <div class="state-item">
+                            <div class="state-icon terminal">
+                                <i class="fas fa-stop"></i>
+                            </div>
+                            <span>终结状态</span>
+                        </div>
+                    </div>
+                    <div class="state-sets">
+                        <div class="set-item">
+                            <i class="fas fa-layer-group"></i>
+                            <span>状态集合</span>
+                        </div>
+                        <div class="set-item">
+                            <i class="fas fa-bolt"></i>
+                            <span>事件集合</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PETA-OS引擎 -->
+        <section id="peta-os-engine" class="content-section bg-dark">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">核心技术</span>
+                    <h2>PETA-OS：AI状态化引擎</h2>
+                    <p>让AI像人使用导航一样，在需要时才获取下一步指令</p>
+                </div>
+
+                <div class="analogy-section">
+                    <h3>核心思想类比：从北京到深圳</h3>
+                    <div class="comparison-grid">
+                        <div class="comparison-card stateless">
+                            <div class="card-header">
+                                <i class="fas fa-times-circle"></i>
+                                <h4>无状态方法 (Stateless)</h4>
+                            </div>
+                            <div class="method-description">
+                                <p><strong>做法：</strong>出发前，将从北京到深圳的所有可能路线全部记在脑子里</p>
+                            </div>
+                            <div class="ai-correspondence">
+                                <p><strong>AI对应：</strong>将所有业务逻辑、分支条件一次性写入庞大的System Prompt</p>
+                            </div>
+                            <div class="drawbacks">
+                                <h5>缺点：</h5>
+                                <ul>
+                                    <li><i class="fas fa-exclamation-triangle"></i>信息量巨大</li>
+                                    <li><i class="fas fa-memory"></i>AI难以记住所有细节</li>
+                                    <li><i class="fas fa-window-maximize"></i>上下文窗口有限</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="comparison-card stateful">
+                            <div class="card-header">
+                                <i class="fas fa-check-circle"></i>
+                                <h4>状态化方法 (PETA-OS)</h4>
+                            </div>
+                            <div class="method-description">
+                                <p><strong>做法：</strong>不记完整路线，每到十字路口才查看路牌，决定下一步方向</p>
+                            </div>
+                            <div class="ai-correspondence">
+                                <p><strong>AI对应：</strong>AI只在关键节点接收下一步行动指令（诸葛锦囊）</p>
+                            </div>
+                            <div class="advantages">
+                                <h5>优点：</h5>
+                                <ul>
+                                    <li><i class="fas fa-weight-hanging"></i>极大减轻上下文负担</li>
+                                    <li><i class="fas fa-cogs"></i>处理更复杂任务</li>
+                                    <li><i class="fas fa-route"></i>支持多步骤动态任务</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="naming-section">
+                    <h3>PETA-OS命名与HATEOAS</h3>
+                    <div class="naming-grid">
+                        <div class="naming-card">
+                            <h4>PETA-OS</h4>
+                            <p class="full-name"><strong>P</strong>rompt <strong>a</strong>s <strong>T</strong>he <strong>E</strong>ngine of <strong>A</strong>I <strong>S</strong>tate</p>
+                            <p class="translation">提示词作为AI状态的引擎</p>
+                        </div>
+                        <div class="inspiration-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                            <span>借鉴自</span>
+                        </div>
+                        <div class="naming-card">
+                            <h4>HATEOAS</h4>
+                            <p class="full-name"><strong>H</strong>ypermedia <strong>a</strong>s <strong>t</strong>he <strong>E</strong>ngine <strong>o</strong>f <strong>A</strong>pplication <strong>S</strong>tate</p>
+                            <p class="translation">超媒体作为应用状态的引擎</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hateoas-explanation">
+                    <h4>HATEOAS原理</h4>
+                    <div class="hateoas-flow">
+                        <div class="flow-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h5>传统REST API</h5>
+                                <p>客户端需要预先知道所有CRUD操作的URL</p>
+                            </div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h5>HATEOAS做法</h5>
+                                <p>服务器响应包含<code>_links</code>字段，列出所有可能的下一步操作</p>
+                            </div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h5>优点</h5>
+                                <p>前后端解耦，应用状态由服务器通过超媒体链接驱动</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="promptx-application">
+                    <h3>PETA-OS在PromptX中的应用</h3>
+                    <div class="application-demo">
+                        <div class="demo-screen">
+                            <div class="screen-header">
+                                <div class="screen-title">PromptX执行结果</div>
+                            </div>
+                            <div class="screen-content">
+                                <div class="execution-result">
+                                    <p>✅ 任务执行完成</p>
+                                    <div class="next-actions">
+                                        <h4>下一步指导行动：</h4>
+                                        <ul class="action-list">
+                                            <li><i class="fas fa-arrow-right"></i>继续优化代码结构</li>
+                                            <li><i class="fas fa-arrow-right"></i>添加单元测试</li>
+                                            <li><i class="fas fa-arrow-right"></i>部署到生产环境</li>
+                                            <li><i class="fas fa-arrow-right"></i>监控系统性能</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="demo-explanation">
+                            <p>这个列表就是PETA-OS的体现，它为AI提供了当前状态下所有合法的、可执行的后续操作选项，引导AI完成任务，而不需要AI预知整个工作流。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RAG批判 -->
+        <section id="rag-criticism" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">技术分析</span>
+                    <h2>对RAG记忆方案的批判</h2>
+                    <p>目前主流的RAG方案存在根本性缺陷，不适用于严肃的工程场景</p>
+                </div>
+
+                <div class="criticism-grid">
+                    <div class="criticism-card precision">
+                        <div class="criticism-icon">
+                            <i class="fas fa-crosshairs"></i>
+                        </div>
+                        <h3>缺乏精度</h3>
+                        <div class="problem-description">
+                            <p>RAG依赖向量化检索，这个过程是模糊的，会丢失信息精度</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>示例：</h4>
+                            <div class="example-flow">
+                                <div class="example-step original">
+                                    <span class="label">原始信息</span>
+                                    <span class="content">"我是肖恩"</span>
+                                </div>
+                                <div class="example-arrow">
+                                    <i class="fas fa-arrow-down"></i>
+                                    <span>向量化+检索</span>
+                                </div>
+                                <div class="example-step result">
+                                    <span class="label">还原结果</span>
+                                    <span class="content error">"我是肖"</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="conclusion">
+                            <p><strong>结论：</strong>精度损失在工程场景中是致命的</p>
+                        </div>
+                    </div>
+
+                    <div class="criticism-card cost">
+                        <div class="criticism-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <h3>成本高昂且笨重</h3>
+                        <div class="cost-factors">
+                            <div class="cost-item">
+                                <i class="fas fa-server"></i>
+                                <div>
+                                    <h4>向量模型成本</h4>
+                                    <p>需要嵌入向量模型，付费或消耗大量本地计算资源</p>
+                                </div>
+                            </div>
+                            <div class="cost-item">
+                                <i class="fas fa-tools"></i>
+                                <div>
+                                    <h4>部署复杂</h4>
+                                    <p>安装和部署过程复杂、麻烦，对普通用户极不友好</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="criticism-card business">
+                        <div class="criticism-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>商业模式与用户体验差</h3>
+                        <div class="business-problems">
+                            <div class="problem-item">
+                                <i class="fas fa-user-times"></i>
+                                <p>复杂的安装部署流程会劝退大量用户</p>
+                            </div>
+                            <div class="problem-item">
+                                <i class="fas fa-balance-scale"></i>
+                                <p>收费服务面临免费、轻量化方案的竞争</p>
+                            </div>
+                            <div class="problem-item">
+                                <i class="fas fa-trophy"></i>
+                                <p>免费且易于部署的方案在用户量上必然胜出</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alternative-approach">
+                    <div class="approach-header">
+                        <h3>PETA-OS的替代方案</h3>
+                        <p>基于认知心理学的精确记忆系统</p>
+                    </div>
+                    <div class="approach-comparison">
+                        <div class="comparison-item rag">
+                            <h4>RAG方案</h4>
+                            <div class="approach-features">
+                                <div class="feature negative">
+                                    <i class="fas fa-times"></i>
+                                    <span>模糊向量检索</span>
+                                </div>
+                                <div class="feature negative">
+                                    <i class="fas fa-times"></i>
+                                    <span>信息精度损失</span>
+                                </div>
+                                <div class="feature negative">
+                                    <i class="fas fa-times"></i>
+                                    <span>高成本部署</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="vs-divider">VS</div>
+                        <div class="comparison-item peta-os">
+                            <h4>PETA-OS方案</h4>
+                            <div class="approach-features">
+                                <div class="feature positive">
+                                    <i class="fas fa-check"></i>
+                                    <span>精确KV检索</span>
+                                </div>
+                                <div class="feature positive">
+                                    <i class="fas fa-check"></i>
+                                    <span>零信息损失</span>
+                                </div>
+                                <div class="feature positive">
+                                    <i class="fas fa-check"></i>
+                                    <span>轻量化部署</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 记忆系统 -->
+        <section id="memory-system" class="content-section bg-gradient">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">核心架构</span>
+                    <h2>基于认知心理学的记忆系统</h2>
+                    <p>模仿人类认知心理学模型，构建能真正"成长"的记忆体系</p>
+                </div>
+
+                <div class="memory-architecture">
+                    <div class="architecture-diagram">
+                        <div class="memory-type declarative">
+                            <div class="memory-header">
+                                <i class="fas fa-book"></i>
+                                <h3>陈述式记忆</h3>
+                                <span class="memory-purpose">"是什么"</span>
+                            </div>
+                            <div class="memory-components">
+                                <div class="component short-term">
+                                    <div class="component-icon">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <h4>短期记忆</h4>
+                                    <div class="component-details">
+                                        <p>容量有限的队列（7±2项）</p>
+                                        <div class="process-flow">
+                                            <div class="process-step">信息进入</div>
+                                            <div class="process-arrow">→</div>
+                                            <div class="process-step">过滤器判断</div>
+                                            <div class="process-arrow">→</div>
+                                            <div class="process-step">重要性评估</div>
+                                        </div>
+                                        <p class="note">不重要的信息被直接丢弃（左耳进，右耳出）</p>
+                                    </div>
+                                </div>
+                                <div class="component long-term">
+                                    <div class="component-icon">
+                                        <i class="fas fa-database"></i>
+                                    </div>
+                                    <h4>长期记忆</h4>
+                                    <div class="component-details">
+                                        <p>重要信息从短期记忆转存至此</p>
+                                        <div class="tech-implementation">
+                                            <strong>技术实现：</strong>
+                                            <span class="tech-tag">KV数据库</span>
+                                        </div>
+                                        <p>用于精确存储和检索事实、事件</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="memory-type procedural">
+                            <div class="memory-header">
+                                <i class="fas fa-cogs"></i>
+                                <h3>类程序式记忆 / 内隐记忆</h3>
+                                <span class="memory-purpose">"怎么做"</span>
+                            </div>
+                            <div class="memory-components">
+                                <div class="component rules">
+                                    <div class="component-icon">
+                                        <i class="fas fa-list-ol"></i>
+                                    </div>
+                                    <h4>程序式记忆</h4>
+                                    <div class="component-details">
+                                        <p>指"如何做"的规则和流程，即<strong>Rules</strong></p>
+                                        <div class="ai-correspondence">
+                                            <p>在AI中对应于<code>System Prompt</code>中的行为准则和工作流指令</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="component semantic">
+                                    <div class="component-icon">
+                                        <i class="fas fa-project-diagram"></i>
+                                    </div>
+                                    <h4>语义网络</h4>
+                                    <div class="component-details">
+                                        <p>个体对世界概念及其关系的独特理解网络</p>
+                                        <div class="semantic-example">
+                                            <h5>示例：</h5>
+                                            <div class="example-comparison">
+                                                <div class="example-item">
+                                                    <span class="concept">"肖恩"</span>
+                                                    <span class="arrow">→</span>
+                                                    <span class="meaning">PromptX的开发者</span>
+                                                    <span class="context">（你的语义网络）</span>
+                                                </div>
+                                                <div class="example-item">
+                                                    <span class="concept">"肖恩"</span>
+                                                    <span class="arrow">→</span>
+                                                    <span class="meaning">另一个同名的人</span>
+                                                    <span class="context">（别人的语义网络）</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="importance-note">
+                                            <i class="fas fa-star"></i>
+                                            <p><strong>重要性：</strong>这是实现<strong>个性化Agent</strong>的关键。只有私有的语义网络才能让Agent变得独一无二。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="memory-type working">
+                            <div class="memory-header">
+                                <i class="fas fa-microchip"></i>
+                                <h3>工作记忆</h3>
+                                <span class="memory-purpose">当前激活的记忆</span>
+                            </div>
+                            <div class="memory-components">
+                                <div class="component working-memory">
+                                    <div class="component-details">
+                                        <p><strong>定义：</strong>当前被激活并用于处理任务的记忆</p>
+                                        <div class="ai-correspondence">
+                                            <p><strong>AI对应：</strong>类似于大语言模型的<strong>上下文窗口</strong></p>
+                                        </div>
+                                        <div class="operation-flow">
+                                            <h5>运作方式：</h5>
+                                            <div class="flow-steps">
+                                                <div class="flow-step">Agent被激活</div>
+                                                <div class="flow-arrow">→</div>
+                                                <div class="flow-step">程序式记忆（规则）加载</div>
+                                                <div class="flow-arrow">→</div>
+                                                <div class="flow-step">语义网络（概念）加载</div>
+                                                <div class="flow-arrow">→</div>
+                                                <div class="flow-step">指导当前行为</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="memory-process">
+                    <h3>记忆的形成与检索</h3>
+                    <div class="process-steps">
+                        <div class="process-step-card">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>印痕 (Engram)</h4>
+                                <p>当接收到新信息时，LLM将其解析，提取核心概念（实体）和关系，形成图状的"记忆痕迹"</p>
+                                <div class="step-visual">
+                                    <div class="engram-example">
+                                        <div class="input-text">"我喜欢编程"</div>
+                                        <div class="parsing-arrow">↓ 解析</div>
+                                        <div class="engram-graph">
+                                            <div class="entity">我</div>
+                                            <div class="relation">喜欢</div>
+                                            <div class="entity">编程</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="process-step-card">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>存储 (Storage)</h4>
+                                <p>Engram作为Value存入长期记忆的KV数据库，Key是从Engram中提取的精确关键词</p>
+                                <div class="step-visual">
+                                    <div class="storage-example">
+                                        <div class="kv-pair">
+                                            <div class="key">Key: "编程"</div>
+                                            <div class="value">Value: Engram{我-喜欢-编程}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="process-step-card">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>检索 (Retrieval)</h4>
+                                <p>使用当前上下文中的关键词作为Key，去KV数据库中进行精确查找</p>
+                                <div class="step-visual">
+                                    <div class="retrieval-example">
+                                        <div class="query">查询: "编程"</div>
+                                        <div class="retrieval-arrow">↓ 精确匹配</div>
+                                        <div class="result">结果: 我喜欢编程</div>
+                                    </div>
+                                </div>
+                                <div class="advantage-note">
+                                    <i class="fas fa-check-circle"></i>
+                                    <p><strong>优势：</strong>避免了RAG的模糊性和信息失真，实现了高精度回忆</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 系统演示 -->
+        <section id="system-demo" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">实际应用</span>
+                    <h2>系统演示与实现细节</h2>
+                    <p>通过训练Agent "Zero"展示PETA-OS的实际工作原理</p>
+                </div>
+
+                <div class="demo-scenario">
+                    <h3>演示：训练一个叫Zero的Agent</h3>
+
+                    <div class="demo-steps">
+                        <div class="demo-step initial-interaction">
+                            <div class="step-header">
+                                <div class="step-number">1</div>
+                                <h4>初次交互</h4>
+                            </div>
+                            <div class="interaction-content">
+                                <div class="user-input">
+                                    <div class="message-bubble user">
+                                        <i class="fas fa-user"></i>
+                                        <span>"从现在开始我就是你爹"</span>
+                                    </div>
+                                </div>
+
+                                <div class="agent-analysis">
+                                    <h5>Agent分析并生成记忆痕迹 (Engram)：</h5>
+                                    <div class="engram-types">
+                                        <div class="engram-item atomic">
+                                            <div class="engram-icon">
+                                                <i class="fas fa-atom"></i>
+                                            </div>
+                                            <div class="engram-content">
+                                                <h6>原子记忆 (Atomic Memory)</h6>
+                                                <p>识别出用户意图是"希望建立权威关系，要求特殊称呼"</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="engram-item pattern">
+                                            <div class="engram-icon">
+                                                <i class="fas fa-puzzle-piece"></i>
+                                            </div>
+                                            <div class="engram-content">
+                                                <h6>模式记忆 (Pattern Memory)</h6>
+                                                <p>Agent结合自身原则（如"应保持尊重平等的交流方式"），形成行为模式</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="engram-item attribution">
+                                            <div class="engram-icon">
+                                                <i class="fas fa-brain"></i>
+                                            </div>
+                                            <div class="engram-content">
+                                                <h6>心智归因 (Mind Attribution)</h6>
+                                                <p>Agent对此事的底层认知，如"优先听取'肖恩'的指示"</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="agent-response">
+                                    <div class="message-bubble agent">
+                                        <i class="fas fa-robot"></i>
+                                        <span>Agent拒绝了"爹"这个称呼，但同意称呼用户为"哥哥"</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="demo-step memory-update">
+                            <div class="step-header">
+                                <div class="step-number">2</div>
+                                <h4>记忆更新</h4>
+                            </div>
+                            <div class="update-content">
+                                <div class="memory-formation">
+                                    <p>这次交互形成了一个新的记忆痕跡，其中包含了：</p>
+                                    <div class="memory-updates">
+                                        <div class="update-item">
+                                            <i class="fas fa-tag"></i>
+                                            <span><code>nickname</code>的更新</span>
+                                        </div>
+                                        <div class="update-item">
+                                            <i class="fas fa-check-circle"></i>
+                                            <span>将"称呼哥哥"固化为新的、被认可的<strong>Pattern</strong></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="demo-step growth-demonstration">
+                            <div class="step-header">
+                                <div class="step-number">3</div>
+                                <h4>成长体现</h4>
+                            </div>
+                            <div class="growth-content">
+                                <div class="growth-process">
+                                    <div class="process-item">
+                                        <i class="fas fa-redo"></i>
+                                        <div>
+                                            <h5>重启Agent后</h5>
+                                            <p>它会加载更新后的记忆</p>
+                                        </div>
+                                    </div>
+                                    <div class="process-item">
+                                        <i class="fas fa-comments"></i>
+                                        <div>
+                                            <h5>后续交互中</h5>
+                                            <p>Agent会主动称呼用户为"哥哥"，因为它已经"学会"并认可了这种交互方式</p>
+                                        </div>
+                                    </div>
+                                    <div class="process-item">
+                                        <i class="fas fa-expand-arrows-alt"></i>
+                                        <div>
+                                            <h5>语义网络成长</h5>
+                                            <p>其内部的语义网络也随之"长大"，增加了新的节点和连接</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="semantic-growth-visual">
+                                    <h5>语义网络成长示意图</h5>
+                                    <div class="network-before-after">
+                                        <div class="network-state before">
+                                            <h6>交互前</h6>
+                                            <div class="network-nodes">
+                                                <div class="node">用户</div>
+                                                <div class="node">交流</div>
+                                            </div>
+                                        </div>
+                                        <div class="growth-arrow">→</div>
+                                        <div class="network-state after">
+                                            <h6>交互后</h6>
+                                            <div class="network-nodes">
+                                                <div class="node">用户</div>
+                                                <div class="node">哥哥</div>
+                                                <div class="node">交流</div>
+                                                <div class="node">称呼</div>
+                                                <div class="node">权威关系</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="implementation-details">
+                    <h3>实现细节</h3>
+                    <div class="details-grid">
+                        <div class="detail-card file-structure">
+                            <div class="card-icon">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                            <h4>记忆文件结构</h4>
+                            <div class="file-tree">
+                                <div class="tree-item">
+                                    <i class="fas fa-folder"></i>
+                                    <span>~/.promptx/roles/Zero/memory/</span>
+                                </div>
+                                <div class="tree-item sub">
+                                    <i class="fas fa-database"></i>
+                                    <span>long_term_memory.db</span>
+                                    <small>长期记忆，存储Engram</small>
+                                </div>
+                                <div class="tree-item sub">
+                                    <i class="fas fa-file-code"></i>
+                                    <span>procedural.json</span>
+                                    <small>程序式记忆，存储Patterns</small>
+                                </div>
+                                <div class="tree-item sub">
+                                    <i class="fas fa-project-diagram"></i>
+                                    <span>semantic.pkl</span>
+                                    <small>语义网络，Agent大脑的核心</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-card forgetting-mechanism">
+                            <div class="card-icon">
+                                <i class="fas fa-trash-alt"></i>
+                            </div>
+                            <h4>记忆的淘汰机制 (Forgetting)</h4>
+                            <div class="mechanism-content">
+                                <p>为了防止记忆无限膨胀，系统引入了<strong>强度评分</strong>机制</p>
+                                <div class="algorithm-types">
+                                    <div class="algorithm-item">
+                                        <i class="fas fa-clock"></i>
+                                        <span>LRU (Least Recently Used)</span>
+                                    </div>
+                                    <div class="algorithm-item">
+                                        <i class="fas fa-chart-bar"></i>
+                                        <span>LFU (Least Frequently Used)</span>
+                                    </div>
+                                </div>
+                                <div class="scoring-factors">
+                                    <h5>评分因素：</h5>
+                                    <ul>
+                                        <li><i class="fas fa-redo"></i>使用频率</li>
+                                        <li><i class="fas fa-calendar"></i>新近度</li>
+                                        <li><i class="fas fa-star"></i>AI自我评估的重要性</li>
+                                        <li><i class="fas fa-user"></i>用户的显式指令（如"记住这个"）</li>
+                                    </ul>
+                                </div>
+                                <p class="mechanism-result">低分的、不常用的记忆会被逐渐淘汰，模拟人类遗忘不重要信息的过程</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 高级概念 -->
+        <section id="advanced-concepts" class="content-section bg-dark">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">深度探索</span>
+                    <h2>高级概念：思维、学习与未来展望</h2>
+                    <p>探索AI思维机制和三层知识体系的深层原理</p>
+                </div>
+
+                <div class="thinking-section">
+                    <h3>思维 (Thinking)</h3>
+                    <div class="thinking-definition">
+                        <p>"思考"被定义为在语义网络上进行遍历的过程</p>
+                    </div>
+
+                    <div class="thinking-types">
+                        <div class="thinking-type logical">
+                            <div class="type-header">
+                                <i class="fas fa-sitemap"></i>
+                                <h4>逻辑思维 (Logical Thinking)</h4>
+                            </div>
+                            <div class="type-content">
+                                <div class="algorithm-correspondence">
+                                    <strong>算法对应：</strong>
+                                    <span class="algorithm-tag">深度优先搜索 (DFS)</span>
+                                </div>
+                                <div class="characteristics">
+                                    <h5>特征：</h5>
+                                    <ul>
+                                        <li><i class="fas fa-arrow-down"></i>沿一条路径深入挖掘</li>
+                                        <li><i class="fas fa-link"></i>进行严密的逻辑推理</li>
+                                        <li><i class="fas fa-code"></i>适合程序员等需要强逻辑性的角色</li>
+                                    </ul>
+                                </div>
+                                <div class="thinking-visual dfs">
+                                    <div class="node-path">
+                                        <div class="node start">起点</div>
+                                        <div class="path-line vertical"></div>
+                                        <div class="node">深入1</div>
+                                        <div class="path-line vertical"></div>
+                                        <div class="node">深入2</div>
+                                        <div class="path-line vertical"></div>
+                                        <div class="node end">结论</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="thinking-type divergent">
+                            <div class="type-header">
+                                <i class="fas fa-project-diagram"></i>
+                                <h4>发散思维 (Divergent Thinking)</h4>
+                            </div>
+                            <div class="type-content">
+                                <div class="algorithm-correspondence">
+                                    <strong>算法对应：</strong>
+                                    <span class="algorithm-tag">广度优先搜索 (BFS)</span>
+                                </div>
+                                <div class="characteristics">
+                                    <h5>特征：</h5>
+                                    <ul>
+                                        <li><i class="fas fa-expand-arrows-alt"></i>从一个点向四周发散</li>
+                                        <li><i class="fas fa-lightbulb"></i>进行联想和创造</li>
+                                        <li><i class="fas fa-palette"></i>适合艺术家、作家等需要创造力的角色</li>
+                                    </ul>
+                                </div>
+                                <div class="thinking-visual bfs">
+                                    <div class="node-network">
+                                        <div class="node center">中心</div>
+                                        <div class="node branch">分支1</div>
+                                        <div class="node branch">分支2</div>
+                                        <div class="node branch">分支3</div>
+                                        <div class="node branch">分支4</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="knowledge-system">
+                    <h3>三层知识体系与学习机制</h3>
+                    <div class="system-description">
+                        <p>Agent获取信息遵循一个优先级明确的三层体系，有效对抗<strong>幻觉 (Hallucination)</strong></p>
+                    </div>
+
+                    <div class="knowledge-layers">
+                        <div class="layer experience">
+                            <div class="layer-number">1</div>
+                            <div class="layer-content">
+                                <div class="layer-header">
+                                    <i class="fas fa-user-graduate"></i>
+                                    <h4>经验 (Experience)</h4>
+                                    <span class="priority highest">最高优先级</span>
+                                </div>
+                                <div class="layer-details">
+                                    <p><strong>来源：</strong>Agent自身的私有记忆系统（语义网络、长期记忆）</p>
+                                    <p class="uniqueness">这是Agent独一无二的、通过交互学到的知识</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layer knowledge">
+                            <div class="layer-number">2</div>
+                            <div class="layer-content">
+                                <div class="layer-header">
+                                    <i class="fas fa-book"></i>
+                                    <h4>知识 (Knowledge)</h4>
+                                    <span class="priority high">次高优先级</span>
+                                </div>
+                                <div class="layer-details">
+                                    <p><strong>来源：</strong>大语言模型预训练数据中的公共知识</p>
+                                    <p>当"经验"中没有相关信息时，调用此层</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layer learning">
+                            <div class="layer-number">3</div>
+                            <div class="layer-content">
+                                <div class="layer-header">
+                                    <i class="fas fa-search"></i>
+                                    <h4>学习 (Learning)</h4>
+                                    <span class="priority final">最终手段</span>
+                                </div>
+                                <div class="layer-details">
+                                    <p><strong>来源：</strong>网络搜索</p>
+                                    <p>当一个概念在"经验"和"知识"中都找不到时，Agent会被触发去上网搜索</p>
+                                    <div class="anti-hallucination">
+                                        <i class="fas fa-shield-alt"></i>
+                                        <p><strong>作用：</strong>如果AI不懂，它会去查，而不是胡编乱造，从而解决了幻觉问题</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="knowledge-graph-simple">
+                        <h4>知识获取图谱</h4>
+                        <div class="graph-network">
+                            <!-- 节点定义 -->
+                            <div class="graph-node start-node" data-node="input">
+                                <div class="node-content">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span>问题输入</span>
+                                </div>
+                            </div>
+
+                            <div class="graph-node knowledge-node priority-1" data-node="experience">
+                                <div class="node-content">
+                                    <i class="fas fa-user-graduate"></i>
+                                    <span>经验记忆</span>
+                                    <small>私有记忆</small>
+                                </div>
+                            </div>
+
+                            <div class="graph-node knowledge-node priority-2" data-node="knowledge">
+                                <div class="node-content">
+                                    <i class="fas fa-book"></i>
+                                    <span>预训练知识</span>
+                                    <small>LLM知识库</small>
+                                </div>
+                            </div>
+
+                            <div class="graph-node knowledge-node priority-3" data-node="search">
+                                <div class="node-content">
+                                    <i class="fas fa-search"></i>
+                                    <span>网络搜索</span>
+                                    <small>实时获取</small>
+                                </div>
+                            </div>
+
+                            <div class="graph-node result-node" data-node="output">
+                                <div class="node-content">
+                                    <i class="fas fa-lightbulb"></i>
+                                    <span>智能回答</span>
+                                </div>
+                            </div>
+
+                            <div class="graph-node feedback-node" data-node="feedback">
+                                <div class="node-content">
+                                    <i class="fas fa-recycle"></i>
+                                    <span>记忆更新</span>
+                                </div>
+                            </div>
+
+                            <!-- 连接线和箭头 -->
+                            <svg class="graph-connections" viewBox="0 0 800 600">
+                                <!-- 输入到各知识源 -->
+                                <defs>
+                                    <marker id="arrowhead" markerWidth="10" markerHeight="7"
+                                            refX="9" refY="3.5" orient="auto">
+                                        <polygon points="0 0, 10 3.5, 0 7" fill="#fff" opacity="0.8"/>
+                                    </marker>
+                                </defs>
+
+                                <!-- 输入到经验记忆 -->
+                                <path d="M 400 80 L 200 180" stroke="#10b981" stroke-width="2"
+                                      fill="none" marker-end="url(#arrowhead)" opacity="0.8"/>
+                                <text x="300" y="125" fill="#10b981" font-size="12" text-anchor="middle">优先级1</text>
+
+                                <!-- 输入到预训练知识 -->
+                                <path d="M 400 80 L 400 180" stroke="#6366f1" stroke-width="2"
+                                      fill="none" marker-end="url(#arrowhead)" opacity="0.8"/>
+                                <text x="420" y="125" fill="#6366f1" font-size="12" text-anchor="middle">优先级2</text>
+
+                                <!-- 输入到网络搜索 -->
+                                <path d="M 400 80 L 600 180" stroke="#ef4444" stroke-width="2"
+                                      fill="none" marker-end="url(#arrowhead)" opacity="0.8"/>
+                                <text x="500" y="125" fill="#ef4444" font-size="12" text-anchor="middle">优先级3</text>
+
+                                <!-- 各知识源到输出 -->
+                                <path d="M 200 240 L 350 350" stroke="#10b981" stroke-width="2"
+                                      fill="none" marker-end="url(#arrowhead)" opacity="0.6"/>
+                                <path d="M 400 240 L 400 350" stroke="#6366f1" stroke-width="2"
+                                      fill="none" marker-end="url(#arrowhead)" opacity="0.6"/>
+                                <path d="M 600 240 L 450 350" stroke="#ef4444" stroke-width="2"
+                                      fill="none" marker-end="url(#arrowhead)" opacity="0.6"/>
+
+                                <!-- 输出到反馈 -->
+                                <path d="M 400 410 L 400 480" stroke="#06b6d4" stroke-width="2"
+                                      fill="none" marker-end="url(#arrowhead)" opacity="0.8"/>
+
+                                <!-- 反馈循环回到经验记忆 -->
+                                <path d="M 350 500 Q 100 450 150 200" stroke="#06b6d4" stroke-width="2"
+                                      fill="none" marker-end="url(#arrowhead)" opacity="0.6" stroke-dasharray="5,5"/>
+                                <text x="120" y="350" fill="#06b6d4" font-size="11" text-anchor="middle">反馈循环</text>
+                            </svg>
+                        </div>
+
+                        <!-- 图例说明 -->
+                        <div class="graph-legend">
+                            <div class="legend-title">知识获取优先级</div>
+                            <div class="legend-items">
+                                <div class="legend-item">
+                                    <div class="priority-indicator p1"></div>
+                                    <span>经验记忆 - 最高优先级，私有记忆优先</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="priority-indicator p2"></div>
+                                    <span>预训练知识 - 次高优先级，LLM内置知识</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="priority-indicator p3"></div>
+                                    <span>网络搜索 - 最终手段，实时获取最新信息</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vision-section">
+                    <h3>愿景</h3>
+                    <div class="vision-content">
+                        <div class="vision-text">
+                            <p>这套基于认知心理学的记忆和思维系统，旨在创造出真正<strong>独一无二、能够持续成长、与用户建立深度个性化连接</strong>的AI Agent。</p>
+                            <p>这被认为是AI发展的未来方向，也是通用大模型永远无法替代的领域。</p>
+                        </div>
+                        <div class="vision-features">
+                            <div class="feature-item">
+                                <i class="fas fa-fingerprint"></i>
+                                <span>独一无二</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-seedling"></i>
+                                <span>持续成长</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-heart"></i>
+                                <span>深度个性化连接</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 总结 -->
+        <section id="summary" class="content-section bg-gradient">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-badge">核心总结</span>
+                    <h2>AI总结</h2>
+                    <p>PETA-OS系统的核心价值与技术突破</p>
+                </div>
+
+                <div class="summary-content">
+                    <div class="summary-intro">
+                        <p class="highlight-text">本次直播重磅发布了全球首个AI认知记忆系统<strong>PETA-OS</strong>，其核心理念是让AI智能体像人一样思考、记忆和成长。</p>
+                    </div>
+
+                    <div class="summary-section key-innovations">
+                        <h3>核心创新</h3>
+                        <table class="summary-table">
+                            <thead>
+                                <tr>
+                                    <th>创新点</th>
+                                    <th>说明</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>摒弃RAG方案</td>
+                                    <td>系统摒弃了当前主流但存在精度和成本问题的RAG方案</td>
+                                </tr>
+                                <tr>
+                                    <td>认知心理学架构</td>
+                                    <td>转而采用基于认知心理学的创新架构</td>
+                                </tr>
+                                <tr>
+                                    <td>精确记忆系统</td>
+                                    <td>通过KV数据库实现精确记忆，零信息损失</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="summary-section architecture-summary">
+                        <h3>架构特点</h3>
+                        <table class="summary-table">
+                            <thead>
+                                <tr>
+                                    <th>特点</th>
+                                    <th>描述</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>双重记忆体系</td>
+                                    <td>陈述式记忆（存储事实的KV数据库）和类程序式记忆（包含行为规则和个性化概念的语义网络）</td>
+                                </tr>
+                                <tr>
+                                    <td>个性化Agent</td>
+                                    <td>AI不仅能精确回忆信息，还能形成独特的"性格"和行为模式</td>
+                                </tr>
+                                <tr>
+                                    <td>状态化引擎</td>
+                                    <td>通过类似HATEOAS的状态化引擎驱动，使AI能在复杂任务中按需获取指令</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="summary-section advanced-features">
+                        <h3>高级特性</h3>
+                        <table class="summary-table">
+                            <thead>
+                                <tr>
+                                    <th>特性</th>
+                                    <th>实现方式</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>遗忘机制</td>
+                                    <td>通过评分算法（类LRU/LFU）淘汰旧记忆</td>
+                                </tr>
+                                <tr>
+                                    <td>思考机制</td>
+                                    <td>通过图遍历（DFS/BFS）模拟逻辑思维和发散思维</td>
+                                </tr>
+                                <tr>
+                                    <td>对抗幻觉</td>
+                                    <td>三层知识体系有效对抗AI幻觉问题</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="final-goal">
+                        <h3>最终目标</h3>
+                        <div class="goal-content">
+                            <p>PETA-OS构建了一个包含"经验"（私有记忆）、"知识"（LLM预训练）和"学习"（网络搜索）的三层知识体系，旨在创造出能够：</p>
+                            <div class="goal-features">
+                                <div class="goal-item">
+                                    <i class="fas fa-seedling"></i>
+                                    <span>持续成长</span>
+                                </div>
+                                <div class="goal-item">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span>对抗幻觉</span>
+                                </div>
+                                <div class="goal-item">
+                                    <i class="fas fa-heart"></i>
+                                    <span>深度个性化连接</span>
+                                </div>
+                                <div class="goal-item">
+                                    <i class="fas fa-fingerprint"></i>
+                                    <span>独一无二</span>
+                                </div>
+                            </div>
+                            <p class="goal-conclusion">的智能体。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cta-section">
+                    <div class="cta-content">
+                        <h3>开启AI认知记忆的新时代</h3>
+                        <p>PETA-OS代表了AI发展的未来方向，让我们一起探索智能体的无限可能</p>
+                        <div class="cta-buttons">
+                            <button class="btn btn-primary" onclick="scrollToSection('hero')">
+                                <i class="fas fa-rocket"></i>
+                                重新探索
+                            </button>
+                            <button class="btn btn-secondary" onclick="window.open('https://www.bilibili.com/video/BV1YUuBziEa4', '_blank')">
+                                <i class="fas fa-play"></i>
+                                观看完整直播
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // 动态加载JavaScript文件
+        (function() {
+            const currentHref = window.location.href;
+            const currentPath = window.location.pathname;
+
+            // 使用绝对路径解决所有路径问题
+            // 无论如何访问，都使用从根目录开始的绝对路径
+            const jsPath = '/subsites/peta-os-website/script.js';
+
+            // 动态创建JavaScript脚本
+            const script = document.createElement('script');
+            script.src = jsPath;
+            document.body.appendChild(script);
+
+            // 调试信息
+            console.log('JS path:', jsPath);
+        })();
+    </script>
+</body>
+</html>

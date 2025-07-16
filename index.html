@@ -5,6 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deepractice 直播记录</title>
     <link rel="stylesheet" href="css/styles.css">
+    <!-- 异步加载外部资源，避免阻塞页面渲染 -->
+    <script>
+        // 异步加载lucide图标库，设置超时机制
+        (function() {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/lucide/0.454.0/lucide.min.css';
+
+            // 设置3秒超时
+            const timeout = setTimeout(() => {
+                console.warn('Lucide CSS加载超时，使用本地图标');
+                link.remove();
+            }, 3000);
+
+            // 加载成功时清除超时
+            link.onload = () => {
+                clearTimeout(timeout);
+                console.log('Lucide CSS加载成功');
+            };
+
+            // 加载失败时的处理
+            link.onerror = () => {
+                clearTimeout(timeout);
+                console.warn('Lucide CSS加载失败，使用本地图标');
+            };
+
+            document.head.appendChild(link);
+        })();
+    </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.454.0/lucide.min.css" rel="stylesheet">
 </head>
 <body>
@@ -124,7 +153,7 @@
                             </div>
                         </div>
                         <div class="featured-card-action">
-                            <a href="peta-os-website/index.html" class="btn btn-primary btn-large">
+                            <a href="subsites/peta-os-website/index.html" class="btn btn-primary btn-large">
                                 立即阅读
                                 <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <line x1="5" y1="12" x2="19" y2="12"/>
