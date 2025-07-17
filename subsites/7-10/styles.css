@@ -1821,15 +1821,16 @@ body {
 .mermaid-example {
     background: var(--bg-secondary);
     border-radius: 12px;
-    padding: var(--spacing-lg);
-    margin-top: var(--spacing-md);
+    padding: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
     border-left: 4px solid var(--accent-color);
 }
 
 .mermaid-example h4 {
     color: var(--primary-color);
     font-weight: 700;
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--font-size-md);
 }
 
 .mermaid-example pre {

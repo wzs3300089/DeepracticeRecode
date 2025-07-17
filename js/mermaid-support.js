@@ -167,13 +167,15 @@ class MermaidSupport {
 
             // 渲染图表
             const { svg } = await this.mermaid.render(chartId, chartDefinition);
-            
+
             // 创建容器并插入SVG
             const container = this.createChartContainer(targetElement);
             container.innerHTML = svg;
-            
-            // 添加响应式支持
-            this.makeResponsive(container);
+
+            // 等待SVG完全加载后再调整尺寸
+            setTimeout(() => {
+                this.makeResponsive(container);
+            }, 100);
             
             console.log(`Mermaid chart rendered successfully: ${chartId}`);
             return true;
@@ -223,6 +225,41 @@ class MermaidSupport {
     makeResponsive(container) {
         const svg = container.querySelector('svg');
         if (svg) {
+            // 检查是否是小尺寸图表
+            const isSmallChart = container.closest('.mermaid-example') || container.closest('.mermaid-small');
+
+            if (isSmallChart) {
+                // 获取SVG的实际渲染尺寸
+                const bbox = svg.getBBox();
+                const svgRect = svg.getBoundingClientRect();
+
+                // 优先使用getBBox，如果失败则使用其他方法
+                let originalWidth, originalHeight;
+
+                try {
+                    originalWidth = bbox.width || svgRect.width || parseFloat(svg.getAttribute('width')) || 800;
+                    originalHeight = bbox.height || svgRect.height || parseFloat(svg.getAttribute('height')) || 600;
+                } catch (e) {
+                    // 如果getBBox失败，使用viewBox或默认值
+                    const viewBox = svg.viewBox.baseVal;
+                    originalWidth = viewBox.width || parseFloat(svg.getAttribute('width')) || 800;
+                    originalHeight = viewBox.height || parseFloat(svg.getAttribute('height')) || 600;
+                }
+
+                // 计算缩放后的尺寸 (scale: 1.0 - 原始大小)
+                const scaledWidth = originalWidth * 1.0;
+                const scaledHeight = originalHeight * 1.0;
+
+                // 设置容器尺寸以匹配缩放后的图表
+                container.style.width = `${Math.ceil(scaledWidth + 32)}px`; // 加上padding (1rem * 2)
+                container.style.height = `${Math.ceil(scaledHeight + 32)}px`;
+                container.style.minHeight = `${Math.max(200, Math.ceil(scaledHeight + 32))}px`;
+                container.style.maxHeight = 'none';
+                container.style.overflow = 'hidden';
+
+                console.log(`📐 调整容器尺寸: ${Math.ceil(scaledWidth)}x${Math.ceil(scaledHeight)} (原始: ${Math.ceil(originalWidth)}x${Math.ceil(originalHeight)})`);
+            }
+
             svg.style.maxWidth = '100%';
             svg.style.height = 'auto';
             svg.removeAttribute('width');

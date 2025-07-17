@@ -41,14 +41,25 @@
 /* 小尺寸图表样式 */
 .mermaid-small .mermaid-container svg,
 .mermaid-example .mermaid-container svg {
-    transform: scale(0.25);
+    transform: scale(1.0);
     transform-origin: center;
+    width: auto !important;
+    height: auto !important;
 }
 
 .mermaid-small .mermaid-container,
 .mermaid-example .mermaid-container {
-    min-height: 60px;
     padding: 1rem;
+    margin: 0.5rem 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 让容器高度自适应原始大小的内容 */
+    height: auto;
+    min-height: 200px;
+    background: #fafafa;
+    border: 1px solid #e0e0e0;
 }
 
 

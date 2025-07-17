@@ -642,7 +642,189 @@ console.log('Sections found:', sections.length);
 
 ---
 
-## 12. 用户体验设计优化实践
+## 12. Mermaid图表集成与尺寸优化实践
+
+### 12.1 Mermaid集成架构设计
+
+#### 12.1.1 统一支持模块架构
+```javascript
+// 核心架构：MermaidSupport类
+class MermaidSupport {
+    constructor() {
+        this.mermaid = null;
+        this.isInitialized = false;
+        this.config = { /* 统一配置 */ };
+    }
+
+    // ESM动态加载
+    async init(customConfig = {}) {
+        const mermaidModule = await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs');
+        this.mermaid = mermaidModule.default;
+    }
+
+    // 智能尺寸计算
+    makeResponsive(container) {
+        const svg = container.querySelector('svg');
+        const bbox = svg.getBBox();
+        // 精确计算并设置容器尺寸
+    }
+}
+```
+
+#### 12.1.2 智能路径检测系统
+```javascript
+// 环境自适应路径检测
+const currentHref = window.location.href;
+const mermaidCssPath = currentHref.includes('github.io')
+    ? '/DeepracticeRecode/css/mermaid-theme.css'
+    : '../../css/mermaid-theme.css';
+```
+
+### 12.2 图表尺寸优化的UX设计逻辑
+
+#### 12.2.1 问题识别与分析
+**初始问题**：
+- Mermaid图表默认尺寸过大，不适合嵌入式展示
+- 容器出现滚动条，破坏页面流畅性
+- 缩放比例不当导致内容不可读
+
+**用户体验痛点**：
+- 需要滑动查看完整图表内容
+- 图表与周围内容比例失调
+- 视觉层次混乱，影响阅读体验
+
+#### 12.2.2 渐进式尺寸优化策略
+
+**第一阶段：过度缩小（scale: 0.25-0.4）**
+```css
+transform: scale(0.25); /* 图表几乎不可见 */
+```
+- **问题**：内容过小，用户无法识别
+- **学习**：过度优化空间利用会牺牲可读性
+
+**第二阶段：适度调整（scale: 0.6）**
+```css
+transform: scale(0.6); /* 有改善但仍然偏小 */
+```
+- **问题**：内容可见但阅读困难
+- **学习**：需要在空间效率和可读性间找平衡
+
+**第三阶段：接近理想（scale: 0.8）**
+```css
+transform: scale(0.8); /* 接近合适但还需要更大 */
+```
+- **问题**：接近可读但用户仍感觉偏小
+- **学习**：用户反馈是最终的评判标准
+
+**最终方案：原始大小（scale: 1.0）**
+```css
+transform: scale(1.0); /* 原始大小，完全可读 */
+```
+- **效果**：内容清晰，用户满意
+- **学习**：有时最简单的方案就是最好的方案
+
+#### 12.2.3 精确容器匹配算法
+
+**核心思想**：容器尺寸 = 图表实际尺寸 + 必要内边距
+
+```javascript
+// 多重尺寸检测策略
+const bbox = svg.getBBox();                    // 首选：内容边界框
+const svgRect = svg.getBoundingClientRect();   // 备选：渲染尺寸
+const attrWidth = parseFloat(svg.getAttribute('width')); // 降级：属性值
+
+// 精确计算
+const scaledWidth = originalWidth * 1.0;  // 无缩放
+const scaledHeight = originalHeight * 1.0;
+
+// 容器适配
+container.style.width = `${Math.ceil(scaledWidth + 32)}px`;
+container.style.height = `${Math.ceil(scaledHeight + 32)}px`;
+```
+
+### 12.3 UX设计原则总结
+
+#### 12.3.1 渐进式优化原则
+1. **从用户反馈出发**：技术指标服务于用户体验
+2. **小步快跑**：通过多次迭代找到最佳方案
+3. **数据驱动**：使用精确的尺寸计算而非估算
+
+#### 12.3.2 视觉层次平衡原则
+```css
+/* 容器视觉增强 */
+.mermaid-example .mermaid-container {
+    background: #fafafa;        /* 浅灰背景区分内容 */
+    border: 1px solid #e0e0e0;  /* 边框定义边界 */
+    padding: 1rem;             /* 充足内边距 */
+    min-height: 200px;         /* 最小高度保证 */
+}
+```
+
+#### 12.3.3 技术与设计融合原则
+- **技术实现**：JavaScript动态计算尺寸
+- **设计考量**：CSS提供视觉框架和降级方案
+- **用户体验**：两者结合实现完美的显示效果
+
+### 12.4 Mermaid应用场景分析
+
+#### 12.4.1 适用场景
+**网站和应用展示**：
+- ✅ 技术文档和教程
+- ✅ 流程图和架构图
+- ✅ 概念解释和演示
+- ✅ 项目文档和说明
+
+**优势**：
+- 文本化定义，易于维护
+- 版本控制友好
+- 自动布局，减少设计工作
+- 多种图表类型支持
+
+#### 12.4.2 不适用场景
+**游戏开发**：
+- ❌ 实时性能要求高
+- ❌ 需要复杂交互
+- ❌ 自定义视觉效果需求
+- ❌ 移动端性能敏感
+
+**原因分析**：
+- Mermaid基于SVG，渲染性能有限
+- 交互能力相对简单
+- 样式定制灵活性不足
+- 加载时间对游戏体验影响较大
+
+### 12.5 技术实现最佳实践
+
+#### 12.5.1 性能优化策略
+```javascript
+// 异步加载和初始化
+setTimeout(() => {
+    this.makeResponsive(container);
+}, 100);
+
+// 错误处理和降级
+try {
+    originalWidth = bbox.width || svgRect.width || defaultWidth;
+} catch (e) {
+    originalWidth = viewBox.width || defaultWidth;
+}
+```
+
+#### 12.5.2 可维护性设计
+```css
+/* 模块化样式设计 */
+.mermaid-container { /* 基础样式 */ }
+.mermaid-example .mermaid-container { /* 特定场景样式 */ }
+```
+
+#### 12.5.3 扩展性考虑
+- 支持多种缩放比例配置
+- 容器样式可定制
+- 图表类型无关的通用算法
+
+---
+
+## 13. 用户体验设计优化实践
 
 ### 12.1 设计优化背景
 
