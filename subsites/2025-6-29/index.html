@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI辅助软件开发流程实践 - Deepractice 2025年6月29日直播</title>
+    <meta name="description" content="基于2025年6月29日直播回放，展示AI时代下软件工程的新范式：从需求分析到开发计划的完整流程，包含User Journey、User Story、OES框架、TDD等方法论。">
+    <meta name="keywords" content="AI辅助开发,软件工程,User Journey,User Story,OES框架,TDD,软件开发流程,AI协作">
+    <meta name="author" content="Deepractice">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="AI辅助软件开发流程实践 - Deepractice">
+    <meta property="og:description" content="展示AI时代下软件工程的新范式，从零到一规划语音工具的完整流程实践">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#f59e0b">
+    <script>
+        // 动态设置正确的CSS路径
+        (function() {
+            // 首先清除任何可能存在的错误CSS链接
+            const existingLinks = document.querySelectorAll('link[rel="stylesheet"]');
+            existingLinks.forEach(link => {
+                if (link.href.includes('styles.css') && !link.href.includes('/subsites/2025-6-29/')) {
+                    console.warn('移除错误的CSS链接:', link.href);
+                    link.remove();
+                }
+            });
+
+            const currentHref = window.location.href;
+            const currentPath = window.location.pathname;
+
+            // 调试信息
+            console.log('Current href:', currentHref);
+            console.log('Current path:', currentPath);
+            console.log('Document location:', document.location);
+            console.log('Base URI:', document.baseURI);
+
+            // 智能路径检测 - 支持本地开发和GitHub Pages部署
+            let cssPath;
+            if (currentHref.includes('github.io')) {
+                // GitHub Pages部署环境
+                cssPath = '/DeepracticeRecode/subsites/2025-6-29/styles.css';
+            } else if (currentPath.includes('/subsites/2025-6-29/')) {
+                // 本地开发或直接访问subsites目录
+                cssPath = './styles.css';
+            } else {
+                // 从根目录访问
+                cssPath = '/subsites/2025-6-29/styles.css';
+            }
+
+            console.log('CSS Path:', cssPath);
+            console.log('Full CSS URL will be:', new URL(cssPath, document.baseURI).href);
+
+            // 确保没有重复的CSS链接
+            const existingMainStyles = document.getElementById('main-styles');
+            if (existingMainStyles) {
+                existingMainStyles.remove();
+                console.log('移除已存在的main-styles链接');
+            }
+
+            // 动态创建CSS链接
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = cssPath;
+            link.id = 'main-styles';
+
+            // 添加加载状态监控
+            link.onload = function() {
+                console.log('✅ CSS加载成功:', cssPath);
+            };
+
+            link.onerror = function() {
+                console.error('❌ CSS加载失败:', cssPath);
+                console.error('尝试的完整URL:', new URL(cssPath, document.baseURI).href);
+            };
+
+            document.head.appendChild(link);
+            console.log('📤 CSS链接已添加到页面');
+
+            // 添加 Mermaid 主题 CSS
+            const mermaidCssPath = currentHref.includes('github.io')
+                ? '/DeepracticeRecode/css/mermaid-theme.css'
+                : '../../css/mermaid-theme.css';
+
+            const mermaidLink = document.createElement('link');
+            mermaidLink.rel = 'stylesheet';
+            mermaidLink.href = mermaidCssPath;
+            mermaidLink.id = 'mermaid-theme';
+            document.head.appendChild(mermaidLink);
+            console.log('📤 Mermaid主题CSS已添加:', mermaidCssPath);
+
+            // 监控所有CSS请求
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'childList') {
+                        mutation.addedNodes.forEach(function(node) {
+                            if (node.tagName === 'LINK' && node.rel === 'stylesheet') {
+                                console.log('🔍 检测到新的CSS链接:', node.href);
+                                if (node.href.includes('styles.css') && !node.href.includes('/subsites/2025-6-29/')) {
+                                    console.error('🚫 阻止错误的CSS请求:', node.href);
+                                    node.remove();
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+            observer.observe(document.head, { childList: true, subtree: true });
+
+            // 返回首页函数
+            window.goBackHome = function() {
+                const currentHref = window.location.href;
+                if (currentHref.includes('github.io')) {
+                    window.location.href = '/DeepracticeRecode/';
+                } else {
+                    window.location.href = '../../index.html';
+                }
+            };
+        })();
+    </script>
+
+    <!-- 全局函数定义 -->
+    <script>
+        // 紧急备用的toggleSidebar函数
+        window.emergencyToggleSidebar = function() {
+            console.log('🚨 紧急备用toggleSidebar被调用');
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                const isMobile = window.innerWidth <= 1024;
+
+                if (isMobile) {
+                    // 移动端：直接控制transform
+                    const currentTransform = window.getComputedStyle(sidebar).transform;
+                    const isHidden = currentTransform.includes('translateX(-') || sidebar.style.transform.includes('translateX(-');
+
+                    if (isHidden) {
+                        sidebar.style.transform = 'translateX(0)';
+                        sidebar.classList.add('active');
+                        console.log('🚨 移动端：显示侧边栏');
+                    } else {
+                        sidebar.style.transform = 'translateX(-100%)';
+                        sidebar.classList.remove('active');
+                        console.log('🚨 移动端：隐藏侧边栏');
+                    }
+                } else {
+                    // PC端：也使用直接transform控制
+                    const currentTransform = window.getComputedStyle(sidebar).transform;
+                    const isHidden = currentTransform.includes('translateX(-') || sidebar.style.transform.includes('translateX(-');
+
+                    if (isHidden) {
+                        sidebar.style.transform = 'translateX(0)';
+                        sidebar.classList.remove('active');
+                        console.log('🚨 PC端：显示侧边栏');
+                    } else {
+                        sidebar.style.transform = 'translateX(-100%)';
+                        sidebar.classList.add('active');
+                        console.log('🚨 PC端：隐藏侧边栏');
+                    }
+                }
+
+                // 调用控制按钮更新函数（如果存在）
+                if (window.updateControlsVisibility) {
+                    window.updateControlsVisibility();
+                } else {
+                    // 简单的控制按钮显示逻辑
+                    const controls = document.querySelector('.sidebar-collapsed-controls');
+                    const mobileBack = document.querySelector('.mobile-back-home');
+
+                    // 统一使用transform检测
+                    const transform = window.getComputedStyle(sidebar).transform;
+                    const isSidebarHidden = transform.includes('translateX(-') || sidebar.style.transform.includes('translateX(-');
+
+                    if (controls) {
+                        controls.style.display = isSidebarHidden ? 'flex' : 'none';
+                    }
+                    if (mobileBack && isMobile) {
+                        mobileBack.style.display = isSidebarHidden ? 'block' : 'none';
+                    }
+
+                    console.log('🚨 紧急更新控制按钮显示:', {isMobile, isSidebarHidden});
+                }
+            }
+        };
+
+        // 立即尝试绑定按钮事件
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const btn = document.getElementById('sidebar-toggle');
+                if (btn && !btn.hasAttribute('data-emergency-bound') && !btn.hasAttribute('data-main-bound')) {
+                    console.log('🚨 主要绑定不存在，应用紧急事件绑定');
+                    btn.addEventListener('click', window.emergencyToggleSidebar);
+                    btn.setAttribute('data-emergency-bound', 'true');
+                } else if (btn && btn.hasAttribute('data-main-bound')) {
+                    console.log('✅ 检测到主要绑定，跳过紧急绑定');
+                }
+            }, 200); // 增加延迟，让主要绑定先执行
+        });
+
+        console.log('📄 HTML内联脚本加载完成');
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 设备区分脚本 -->
+    <script>
+        // 立即根据设备类型设置初始状态
+        (function() {
+            // 等待DOM元素创建
+            setTimeout(function() {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar) {
+                    const isMobile = window.innerWidth <= 1024;
+
+                    if (isMobile) {
+                        // 移动端：强制隐藏
+                        sidebar.style.transform = 'translateX(-100%)';
+                        sidebar.classList.remove('active');
+                        console.log('📱 HTML内联：移动端侧边栏设置为隐藏');
+                    } else {
+                        // PC端：确保显示
+                        sidebar.style.transform = 'translateX(0)';
+                        sidebar.classList.remove('active');
+                        console.log('�️ HTML内联：PC端侧边栏设置为显示');
+                    }
+                }
+            }, 10);
+        })();
+    </script>
+
+    <!-- 左侧浮动导航 -->
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-cogs"></i>
+                <span>AI开发</span>
+            </div>
+            <button id="sidebar-toggle" class="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="sidebar-content">
+            <!-- 返回首页按钮 -->
+            <div class="back-to-home">
+                <a href="javascript:void(0)" class="back-home-btn" onclick="goBackHome()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>返回首页</span>
+                </a>
+            </div>
+
+            <ul class="nav-menu">
+                <li><a href="javascript:void(0)" class="nav-link active" data-section="hero">
+                    <i class="fas fa-home"></i>概述
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="requirements">
+                    <i class="fas fa-lightbulb"></i>需求分析
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="user-journey">
+                    <i class="fas fa-route"></i>用户旅程
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="user-story">
+                    <i class="fas fa-tasks"></i>用户故事
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="tech-stack">
+                    <i class="fas fa-layer-group"></i>技术选型
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="architecture">
+                    <i class="fas fa-sitemap"></i>架构设计
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="oes-planning">
+                    <i class="fas fa-project-diagram"></i>OES规划
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="development">
+                    <i class="fas fa-code"></i>开发计划
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="promptx-demo">
+                    <i class="fas fa-tools"></i>PromptX演示
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="ai-summary">
+                    <i class="fas fa-graduation-cap"></i>AI总结
+                </a></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="progress-indicator">
+                <div class="progress-bar" id="reading-progress"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 侧边栏隐藏时的控制按钮 -->
+    <div class="sidebar-collapsed-controls">
+        <button id="sidebar-expand" class="sidebar-expand-btn" title="展开侧边栏" onclick="window.emergencyToggleSidebar && window.emergencyToggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <a href="javascript:void(0)" class="quick-back-btn" title="返回首页" onclick="goBackHome()">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+    <!-- 移动端返回首页浮动按钮 -->
+    <div class="mobile-back-home">
+        <a href="javascript:void(0)" class="mobile-back-btn" title="返回首页" onclick="goBackHome()">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+    <!-- 主内容区域 -->
+    <main class="main-content">
+        <!-- 英雄区域 -->
+        <section id="hero" class="hero-section">
+            <div class="hero-background">
+                <div class="neural-network"></div>
+            </div>
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-rocket"></i>
+                    <span>AI时代新范式</span>
+                </div>
+                <h1 class="hero-title">
+                    <span class="gradient-text">AI辅助软件开发</span>
+                    <br>流程实践
+                </h1>
+                <p class="hero-subtitle">
+                    从零到一规划语音工具：展示AI时代下软件工程的新范式
+                </p>
+                <div class="hero-features">
+                    <div class="feature-item">
+                        <i class="fas fa-brain"></i>
+                        <span>AI协作</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>结构化规划</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-cogs"></i>
+                        <span>工程方法论</span>
+                    </div>
+                </div>
+                <div class="hero-actions">
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" onclick="scrollToSection('requirements')">
+                            <i class="fas fa-play"></i>
+                            开始探索
+                        </button>
+                        <a href="https://www.bilibili.com/video/BV1F6gzzREv6" target="_blank" class="btn btn-secondary">
+                            <i class="fas fa-video"></i>
+                            直播回放
+                        </a>
+                    </div>
+                    <div class="hero-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>2025年6月29日</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>直播回放</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 需求分析与MVP定义 -->
+        <section id="requirements" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h2 class="section-title">需求分析与MVP定义</h2>
+                    <p class="section-subtitle">识别核心痛点，定义产品目标</p>
+                </div>
+
+                <div class="content-grid">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h3>核心痛点</h3>
+                        </div>
+                        <div class="card-content">
+                            <p>随着AI使用频率急剧上升，通过键盘输入提示词（Prompt）效率低下，需要一种通过口述快速输入并优化提示词的解决方案。</p>
+                            <div class="highlight-box">
+                                <i class="fas fa-quote-left"></i>
+                                <p>"键盘输入提示词效率低下"</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-header">
+                            <i class="fas fa-target"></i>
+                            <h3>产品目标</h3>
+                        </div>
+                        <div class="card-content">
+                            <p>开发一个桌面端MVP，实现语音输入、AI优化、自动填充的完整流程。</p>
+                            <ul class="feature-list">
+                                <li><i class="fas fa-microphone"></i>语音输入识别</li>
+                                <li><i class="fas fa-magic"></i>AI智能优化</li>
+                                <li><i class="fas fa-clipboard"></i>自动填充粘贴</li>
+                                <li><i class="fas fa-desktop"></i>桌面端应用</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-header">
+                            <i class="fas fa-handshake"></i>
+                            <h3>AI协作方法</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="process-steps">
+                                <div class="step">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <h4>设定背景</h4>
+                                        <p>向AI清晰描述项目背景、目标和核心需求</p>
+                                    </div>
+                                </div>
+                                <div class="step">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <h4>引入专业概念</h4>
+                                        <p>使用User Journey等术语引导AI思考</p>
+                                    </div>
+                                </div>
+                                <div class="step">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <h4>人工优化决策</h4>
+                                        <p>基于专业知识修正和增强AI建议</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 用户旅程设计 -->
+        <section id="user-journey" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-route"></i>
+                    </div>
+                    <h2 class="section-title">User Journey 设计</h2>
+                    <p class="section-subtitle">从用户视角思考产品使用流程</p>
+                </div>
+
+                <div class="journey-flow">
+                    <div class="flow-step">
+                        <div class="step-icon">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="step-content">
+                            <h3>激活</h3>
+                            <p>用户通过悬浮球或快捷键激活应用</p>
+                        </div>
+                        <div class="step-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-icon">
+                            <i class="fas fa-microphone"></i>
+                        </div>
+                        <div class="step-content">
+                            <h3>输入</h3>
+                            <p>开始语音输入，系统实时识别</p>
+                        </div>
+                        <div class="step-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-icon">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        <div class="step-content">
+                            <h3>处理</h3>
+                            <p>AI将语音转文字并优化扩写</p>
+                        </div>
+                        <div class="step-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="flow-step">
+                        <div class="step-icon">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <div class="step-content">
+                            <h3>输出</h3>
+                            <p>展示结果并自动粘贴到当前窗口</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="optimization-notes">
+                    <div class="note-card">
+                        <div class="note-header">
+                            <i class="fas fa-wrench"></i>
+                            <h3>技术修正</h3>
+                        </div>
+                        <p>AI初始建议使用Web Speech API，基于专业知识修正为使用更精准的Whisper模型进行语音识别。</p>
+                    </div>
+
+                    <div class="note-card">
+                        <div class="note-header">
+                            <i class="fas fa-star"></i>
+                            <h3>功能增强</h3>
+                        </div>
+                        <p>从"一键复制"升级为"自动粘贴到当前激活窗口"，显著提升用户体验和操作效率。</p>
+                    </div>
+
+                    <div class="note-card">
+                        <div class="note-header">
+                            <i class="fas fa-cog"></i>
+                            <h3>配置需求</h3>
+                        </div>
+                        <p>需要配置界面用于设置大模型API Key等参数，确保系统的灵活性和可配置性。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 用户故事拆分 -->
+        <section id="user-story" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <h2 class="section-title">User Story 拆分</h2>
+                    <p class="section-subtitle">将宏观旅程分解为具体可执行的开发任务</p>
+                </div>
+
+                <div class="story-format">
+                    <div class="format-card">
+                        <div class="format-header">
+                            <i class="fas fa-file-alt"></i>
+                            <h3>User Story 格式</h3>
+                        </div>
+                        <div class="format-content">
+                            <div class="format-template">
+                                <p class="template-text">
+                                    "作为一名<span class="highlight">[角色]</span>，我希望<span class="highlight">[实现某个功能]</span>，以便于<span class="highlight">[获得某种价值]</span>"
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stories-grid">
+                    <div class="story-card">
+                        <div class="story-header">
+                            <i class="fas fa-keyboard"></i>
+                            <h3>全局快捷键启动</h3>
+                        </div>
+                        <div class="story-content">
+                            <p class="story-text">作为用户，我希望能通过全局快捷键快速启动语音输入，这样我就不需要频繁切换窗口。</p>
+                            <div class="acceptance-criteria">
+                                <h4>验收标准</h4>
+                                <ul>
+                                    <li>支持自定义快捷键设置</li>
+                                    <li>快捷键在任何应用中都能响应</li>
+                                    <li>启动时间小于500ms</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="story-card">
+                        <div class="story-header">
+                            <i class="fas fa-microphone-alt"></i>
+                            <h3>语音识别转换</h3>
+                        </div>
+                        <div class="story-content">
+                            <p class="story-text">作为用户，我希望能够通过语音输入内容，系统能准确识别并转换为文字。</p>
+                            <div class="acceptance-criteria">
+                                <h4>验收标准</h4>
+                                <ul>
+                                    <li>支持中英文混合识别</li>
+                                    <li>识别准确率达到95%以上</li>
+                                    <li>支持实时语音反馈</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="story-card">
+                        <div class="story-header">
+                            <i class="fas fa-magic"></i>
+                            <h3>AI智能优化</h3>
+                        </div>
+                        <div class="story-content">
+                            <p class="story-text">作为用户，我希望AI能够自动优化我的语音输入，生成更专业的提示词。</p>
+                            <div class="acceptance-criteria">
+                                <h4>验收标准</h4>
+                                <ul>
+                                    <li>支持多种优化模式</li>
+                                    <li>保持原意的同时提升表达</li>
+                                    <li>提供优化前后对比</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="story-card">
+                        <div class="story-header">
+                            <i class="fas fa-paste"></i>
+                            <h3>自动粘贴功能</h3>
+                        </div>
+                        <div class="story-content">
+                            <p class="story-text">作为用户，我希望优化后的内容能自动粘贴到当前激活的窗口，提升操作效率。</p>
+                            <div class="acceptance-criteria">
+                                <h4>验收标准</h4>
+                                <ul>
+                                    <li>准确识别当前激活窗口</li>
+                                    <li>支持多种应用程序</li>
+                                    <li>提供手动复制备选方案</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="methodology-note">
+                    <div class="note-content">
+                        <i class="fas fa-info-circle"></i>
+                        <p><strong>与PRD的区别：</strong>对于此小型项目，无需编写复杂的PRD（产品需求文档），User Story已经足够清晰地定义了需求。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 技术选型 -->
+        <section id="tech-stack" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h2 class="section-title">技术选型</h2>
+                    <p class="section-subtitle">确定实现项目所需的技术框架、库和API</p>
+                </div>
+
+                <div class="tech-stack-grid">
+                    <div class="tech-category">
+                        <div class="category-header">
+                            <i class="fas fa-desktop"></i>
+                            <h3>前端/桌面端</h3>
+                        </div>
+                        <div class="tech-items">
+                            <div class="tech-item">
+                                <div class="tech-icon">
+                                    <i class="fab fa-js-square"></i>
+                                </div>
+                                <div class="tech-info">
+                                    <h4>Electron</h4>
+                                    <p>跨平台桌面应用框架</p>
+                                </div>
+                            </div>
+                            <div class="tech-item">
+                                <div class="tech-icon">
+                                    <i class="fab fa-react"></i>
+                                </div>
+                                <div class="tech-info">
+                                    <h4>React / Vue</h4>
+                                    <p>现代化前端框架</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tech-category">
+                        <div class="category-header">
+                            <i class="fas fa-microphone"></i>
+                            <h3>语音识别</h3>
+                        </div>
+                        <div class="tech-items">
+                            <div class="tech-item">
+                                <div class="tech-icon">
+                                    <i class="fas fa-brain"></i>
+                                </div>
+                                <div class="tech-info">
+                                    <h4>Whisper API</h4>
+                                    <p>OpenAI高精度语音识别</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tech-category">
+                        <div class="category-header">
+                            <i class="fas fa-magic"></i>
+                            <h3>提示词优化</h3>
+                        </div>
+                        <div class="tech-items">
+                            <div class="tech-item">
+                                <div class="tech-icon">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div class="tech-info">
+                                    <h4>OpenAI GPT</h4>
+                                    <p>GPT-4等大语言模型</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="selection-principle">
+                    <div class="principle-card">
+                        <div class="principle-header">
+                            <i class="fas fa-star"></i>
+                            <h3>核心原则</h3>
+                        </div>
+                        <div class="principle-content">
+                            <p>选择自己熟悉且能掌控的技术栈至关重要。这样在开发过程中遇到问题时，才能有能力去解决，而不是完全受制于AI的建议。</p>
+                            <div class="principle-points">
+                                <div class="point">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>技术熟悉度优先</span>
+                                </div>
+                                <div class="point">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>问题解决能力</span>
+                                </div>
+                                <div class="point">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>避免过度依赖AI</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 架构设计 -->
+        <section id="architecture" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-sitemap"></i>
+                    </div>
+                    <h2 class="section-title">架构设计</h2>
+                    <p class="section-subtitle">设计系统整体架构，明确各模块关系和数据流</p>
+                </div>
+
+                <div class="architecture-diagram">
+                    <div class="arch-layer">
+                        <div class="layer-title">
+                            <i class="fas fa-eye"></i>
+                            <h3>用户界面层</h3>
+                        </div>
+                        <div class="layer-components">
+                            <div class="component">
+                                <i class="fas fa-window-maximize"></i>
+                                <span>主窗口界面</span>
+                            </div>
+                            <div class="component">
+                                <i class="fas fa-cog"></i>
+                                <span>配置界面</span>
+                            </div>
+                            <div class="component">
+                                <i class="fas fa-circle"></i>
+                                <span>悬浮球</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="arch-arrow">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+
+                    <div class="arch-layer">
+                        <div class="layer-title">
+                            <i class="fas fa-cogs"></i>
+                            <h3>业务逻辑层</h3>
+                        </div>
+                        <div class="layer-components">
+                            <div class="component">
+                                <i class="fas fa-microphone"></i>
+                                <span>语音录制模块</span>
+                            </div>
+                            <div class="component">
+                                <i class="fas fa-brain"></i>
+                                <span>AI处理模块</span>
+                            </div>
+                            <div class="component">
+                                <i class="fas fa-clipboard"></i>
+                                <span>剪贴板模块</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="arch-arrow">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+
+                    <div class="arch-layer">
+                        <div class="layer-title">
+                            <i class="fas fa-server"></i>
+                            <h3>服务接口层</h3>
+                        </div>
+                        <div class="layer-components">
+                            <div class="component">
+                                <i class="fas fa-cloud"></i>
+                                <span>Whisper API</span>
+                            </div>
+                            <div class="component">
+                                <i class="fas fa-robot"></i>
+                                <span>OpenAI API</span>
+                            </div>
+                            <div class="component">
+                                <i class="fas fa-database"></i>
+                                <span>本地存储</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="design-insights">
+                    <div class="insight-card">
+                        <div class="insight-header">
+                            <i class="fas fa-lightbulb"></i>
+                            <h3>关键理念</h3>
+                        </div>
+                        <div class="insight-content">
+                            <p>技术架构是"如何实现"，而用户故事关注的是"用户如何使用"，后者才是决定产品价值的关键。</p>
+                            <div class="emphasis-box">
+                                <i class="fas fa-quote-left"></i>
+                                <p>"产品的最终买单者是用户，而非技术人员"</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insight-card">
+                        <div class="insight-header">
+                            <i class="fas fa-palette"></i>
+                            <h3>UI/UX设计</h3>
+                        </div>
+                        <div class="insight-content">
+                            <p>AI根据前面的信息，生成了初步的技术架构图和UI/UX设计草图，为后续开发提供了清晰的指导。</p>
+                            <ul class="design-points">
+                                <li>简洁直观的用户界面</li>
+                                <li>快速响应的交互设计</li>
+                                <li>清晰的状态反馈机制</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OES任务规划 -->
+        <section id="oes-planning" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <h2 class="section-title">OES任务规划</h2>
+                    <p class="section-subtitle">基于Objective-Environment-Strategy框架生成结构化执行计划</p>
+                </div>
+
+                <div class="oes-framework">
+                    <div class="oes-component">
+                        <div class="oes-header">
+                            <i class="fas fa-target"></i>
+                            <h3>Objective (目标)</h3>
+                        </div>
+                        <div class="oes-content">
+                            <p>开发一款桌面端语音提示词优化工具MVP，实现从语音输入到智能优化再到自动粘贴的完整流程。</p>
+                            <div class="objective-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-check"></i>
+                                    <span>语音识别准确率 ≥ 95%</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-check"></i>
+                                    <span>响应时间 ≤ 3秒</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-check"></i>
+                                    <span>支持主流操作系统</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="oes-component">
+                        <div class="oes-header">
+                            <i class="fas fa-globe"></i>
+                            <h3>Environment (环境)</h3>
+                        </div>
+                        <div class="oes-content">
+                            <p>一小时编程马拉松的时间限制下，需要快速构建可演示的MVP原型。</p>
+                            <div class="environment-factors">
+                                <div class="factor">
+                                    <i class="fas fa-clock"></i>
+                                    <span>时间约束：1小时</span>
+                                </div>
+                                <div class="factor">
+                                    <i class="fas fa-user"></i>
+                                    <span>单人开发</span>
+                                </div>
+                                <div class="factor">
+                                    <i class="fas fa-laptop"></i>
+                                    <span>桌面端环境</span>
+                                </div>
+                                <div class="factor">
+                                    <i class="fas fa-wifi"></i>
+                                    <span>需要网络连接</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="oes-component">
+                        <div class="oes-header">
+                            <i class="fas fa-chess"></i>
+                            <h3>Strategy (策略)</h3>
+                        </div>
+                        <div class="oes-content">
+                            <p>采用敏捷开发方法，优先实现核心功能，通过AI协作加速开发进程。</p>
+                            <div class="strategy-points">
+                                <div class="strategy-item">
+                                    <div class="strategy-number">1</div>
+                                    <div class="strategy-text">
+                                        <h4>MVP优先</h4>
+                                        <p>专注核心功能实现</p>
+                                    </div>
+                                </div>
+                                <div class="strategy-item">
+                                    <div class="strategy-number">2</div>
+                                    <div class="strategy-text">
+                                        <h4>AI协作</h4>
+                                        <p>利用AI加速代码生成</p>
+                                    </div>
+                                </div>
+                                <div class="strategy-item">
+                                    <div class="strategy-number">3</div>
+                                    <div class="strategy-text">
+                                        <h4>快速迭代</h4>
+                                        <p>边开发边测试验证</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="oes-benefits">
+                    <div class="benefit-card">
+                        <i class="fas fa-magic"></i>
+                        <h3>OES框架价值</h3>
+                        <p>OES框架能引导AI生成结构化的执行计划，确保项目规划的系统性和可执行性。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 开发计划与TDD -->
+        <section id="development" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h2 class="section-title">开发计划与TDD</h2>
+                    <p class="section-subtitle">基于需求、设计文档生成完整的分步开发任务清单</p>
+                </div>
+
+                <div class="development-phases">
+                    <div class="phase-group">
+                        <div class="phase-header">
+                            <i class="fas fa-play"></i>
+                            <h3>阶段一：准备与设置</h3>
+                        </div>
+                        <div class="phase-tasks">
+                            <div class="task-item">
+                                <div class="task-number">1</div>
+                                <div class="task-content">
+                                    <h4>需求分析与可行性验证</h4>
+                                    <p>确认技术方案的可行性和资源需求</p>
+                                </div>
+                            </div>
+                            <div class="task-item">
+                                <div class="task-number">2</div>
+                                <div class="task-content">
+                                    <h4>搭建项目基础结构</h4>
+                                    <p>初始化Electron + React项目框架</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="phase-group">
+                        <div class="phase-header">
+                            <i class="fas fa-cogs"></i>
+                            <h3>阶段二：核心功能开发</h3>
+                        </div>
+                        <div class="phase-tasks">
+                            <div class="task-item">
+                                <div class="task-number">3</div>
+                                <div class="task-content">
+                                    <h4>实现语音录制与控制</h4>
+                                    <p>集成麦克风录制和音频处理功能</p>
+                                </div>
+                            </div>
+                            <div class="task-item">
+                                <div class="task-number">4</div>
+                                <div class="task-content">
+                                    <h4>集成Whisper API</h4>
+                                    <p>实现语音转文本的核心功能</p>
+                                </div>
+                            </div>
+                            <div class="task-item">
+                                <div class="task-number">5</div>
+                                <div class="task-content">
+                                    <h4>集成大模型API</h4>
+                                    <p>实现提示词优化和扩写功能</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="phase-group">
+                        <div class="phase-header">
+                            <i class="fas fa-puzzle-piece"></i>
+                            <h3>阶段三：集成与交付</h3>
+                        </div>
+                        <div class="phase-tasks">
+                            <div class="task-item">
+                                <div class="task-number">6</div>
+                                <div class="task-content">
+                                    <h4>开发UI界面</h4>
+                                    <p>实现用户界面和交互逻辑</p>
+                                </div>
+                            </div>
+                            <div class="task-item">
+                                <div class="task-number">7</div>
+                                <div class="task-content">
+                                    <h4>功能集成与端到端测试</h4>
+                                    <p>整合所有模块并进行全流程测试</p>
+                                </div>
+                            </div>
+                            <div class="task-item">
+                                <div class="task-number">8</div>
+                                <div class="task-content">
+                                    <h4>打包与分发</h4>
+                                    <p>生成可执行文件并准备发布</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tdd-emphasis">
+                    <div class="tdd-card">
+                        <div class="tdd-header">
+                            <i class="fas fa-vial"></i>
+                            <h3>测试驱动开发 (TDD)</h3>
+                        </div>
+                        <div class="tdd-content">
+                            <p>讲者主动要求AI在规划中加入测试环节，明确要求提前设计单元测试和集成测试用例，确保软件质量。</p>
+                            <div class="tdd-cycle">
+                                <div class="cycle-step">
+                                    <i class="fas fa-edit"></i>
+                                    <span>编写测试</span>
+                                </div>
+                                <div class="cycle-arrow">→</div>
+                                <div class="cycle-step">
+                                    <i class="fas fa-code"></i>
+                                    <span>实现功能</span>
+                                </div>
+                                <div class="cycle-arrow">→</div>
+                                <div class="cycle-step">
+                                    <i class="fas fa-sync"></i>
+                                    <span>重构优化</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="methodology-summary">
+                    <div class="summary-card">
+                        <div class="summary-header">
+                            <i class="fas fa-graduation-cap"></i>
+                            <h3>软件工程新范式</h3>
+                        </div>
+                        <div class="summary-content">
+                            <p>本次直播展示了AI时代下软件开发的新范式：开发者不再是单纯的编码者，而是扮演"项目经理"或"架构师"的角色，利用专业知识引导AI完成结构化的项目规划。</p>
+                            <div class="paradigm-flow">
+                                <div class="flow-item">需求分析 (User Journey)</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-item">需求拆分 (User Story)</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-item">技术选型</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-item">架构设计</div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-item">任务规划 (OES)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PromptX鲁班工具演示 -->
+        <section id="promptx-demo" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <h2 class="section-title">PromptX鲁班工具演示</h2>
+                    <p class="section-subtitle">AI任务创建和执行工具的实际应用</p>
+                </div>
+
+                <div class="demo-content">
+                    <div class="demo-intro">
+                        <div class="intro-card">
+                            <div class="intro-header">
+                                <i class="fas fa-hammer"></i>
+                                <h3>工具介绍</h3>
+                            </div>
+                            <div class="intro-content">
+                                <p><strong>PromptX鲁班</strong>是一个可以用于创建和执行AI任务的工具，在本次直播中展示了其在软件工程项目规划中的实际应用。</p>
+                                <div class="demo-features">
+                                    <div class="feature-point">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>AI任务自动化创建</span>
+                                    </div>
+                                    <div class="feature-point">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>结构化项目规划</span>
+                                    </div>
+                                    <div class="feature-point">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>专业工程方法论集成</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="demo-timeline">
+                        <div class="timeline-header">
+                            <i class="fas fa-clock"></i>
+                            <h3>演示时间轴</h3>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker">
+                                <i class="fas fa-play"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>05:22 - 工具演示开始</h4>
+                                <p>展示PromptX鲁班工具的基本功能和界面操作</p>
+                                <a href="https://www.bilibili.com/video/BV1F6gzzREv6?t=322" target="_blank" class="timeline-link">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    观看此片段
+                                </a>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h4>14:54 - 软件工程实践</h4>
+                                <p>使用工具进行AI辅助软件开发流程的完整演示</p>
+                                <a href="https://www.bilibili.com/video/BV1F6gzzREv6?t=894" target="_blank" class="timeline-link">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    观看此片段
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="demo-highlights">
+                        <div class="highlight-card">
+                            <div class="highlight-header">
+                                <i class="fas fa-star"></i>
+                                <h3>演示亮点</h3>
+                            </div>
+                            <div class="highlight-content">
+                                <ul class="highlight-list">
+                                    <li>展示了如何使用AI工具进行结构化的项目规划</li>
+                                    <li>演示了专业软件工程方法论与AI工具的结合</li>
+                                    <li>实际操作了从需求分析到任务拆解的完整流程</li>
+                                    <li>体现了AI时代下开发者角色的转变</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI总结 -->
+        <section id="ai-summary" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h2 class="section-title">AI总结</h2>
+                    <p class="section-subtitle">本次直播的核心价值和深层思考</p>
+                </div>
+
+                <div class="summary-content">
+                    <div class="summary-main">
+                        <div class="summary-card">
+                            <div class="summary-header">
+                                <i class="fas fa-lightbulb"></i>
+                                <h3>核心思想</h3>
+                            </div>
+                            <div class="summary-text">
+                                <p>本次直播深入演示了如何将AI工具与专业的软件工程方法论相结合，实现高效、结构化的项目规划。核心思想是，<strong>开发者不再是单纯的编码者，而是扮演一个"项目经理"或"架构师"的角色</strong>，利用自身的专业知识引导AI完成从需求分析到任务拆解的全过程。</p>
+                            </div>
+                        </div>
+
+                        <div class="summary-card">
+                            <div class="summary-header">
+                                <i class="fas fa-route"></i>
+                                <h3>清晰路径</h3>
+                            </div>
+                            <div class="summary-text">
+                                <p>整个流程遵循了清晰的路径：</p>
+                                <div class="process-flow">
+                                    <div class="flow-step-summary">
+                                        <span class="step-label">需求分析</span>
+                                        <span class="step-detail">(User Journey)</span>
+                                    </div>
+                                    <div class="flow-arrow-summary">→</div>
+                                    <div class="flow-step-summary">
+                                        <span class="step-label">需求拆分</span>
+                                        <span class="step-detail">(User Story)</span>
+                                    </div>
+                                    <div class="flow-arrow-summary">→</div>
+                                    <div class="flow-step-summary">
+                                        <span class="step-label">技术选型</span>
+                                    </div>
+                                    <div class="flow-arrow-summary">→</div>
+                                    <div class="flow-step-summary">
+                                        <span class="step-label">架构设计</span>
+                                    </div>
+                                    <div class="flow-arrow-summary">→</div>
+                                    <div class="flow-step-summary">
+                                        <span class="step-label">任务规划</span>
+                                        <span class="step-detail">(OES)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="summary-card">
+                            <div class="summary-header">
+                                <i class="fas fa-trophy"></i>
+                                <h3>重要价值</h3>
+                            </div>
+                            <div class="summary-text">
+                                <p>这种方法不仅极大地提升了开发效率，更重要的是，它通过结构化的文档和明确的步骤，保证了项目的可维护性和可持续性，<strong>展示了AI时代下软件开发的新范式</strong>。</p>
+                                <div class="value-points">
+                                    <div class="value-item">
+                                        <i class="fas fa-rocket"></i>
+                                        <span>提升开发效率</span>
+                                    </div>
+                                    <div class="value-item">
+                                        <i class="fas fa-shield-alt"></i>
+                                        <span>保证项目质量</span>
+                                    </div>
+                                    <div class="value-item">
+                                        <i class="fas fa-sync"></i>
+                                        <span>确保可维护性</span>
+                                    </div>
+                                    <div class="value-item">
+                                        <i class="fas fa-infinity"></i>
+                                        <span>实现可持续性</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="paradigm-shift">
+                        <div class="shift-card">
+                            <div class="shift-header">
+                                <i class="fas fa-exchange-alt"></i>
+                                <h3>范式转变</h3>
+                            </div>
+                            <div class="shift-content">
+                                <div class="shift-comparison">
+                                    <div class="shift-before">
+                                        <h4>传统模式</h4>
+                                        <ul>
+                                            <li>开发者 = 编码者</li>
+                                            <li>手工编写所有代码</li>
+                                            <li>线性开发流程</li>
+                                            <li>文档滞后于开发</li>
+                                        </ul>
+                                    </div>
+                                    <div class="shift-arrow">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </div>
+                                    <div class="shift-after">
+                                        <h4>AI时代新模式</h4>
+                                        <ul>
+                                            <li>开发者 = 项目架构师</li>
+                                            <li>AI协作生成代码</li>
+                                            <li>结构化规划流程</li>
+                                            <li>文档驱动开发</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // 动态加载JavaScript文件
+        (function() {
+            const currentHref = window.location.href;
+            const currentPath = window.location.pathname;
+
+            // 智能路径检测 - 支持本地开发和GitHub Pages部署
+            let jsPath;
+            if (currentHref.includes('github.io')) {
+                // GitHub Pages部署环境
+                jsPath = '/DeepracticeRecode/subsites/2025-6-29/script.js';
+            } else if (currentPath.includes('/subsites/2025-6-29/')) {
+                // 本地开发或直接访问subsites目录
+                jsPath = './script.js';
+            } else {
+                // 从根目录访问
+                jsPath = '/subsites/2025-6-29/script.js';
+            }
+
+            // 动态创建JavaScript脚本
+            const script = document.createElement('script');
+            script.src = jsPath;
+            document.body.appendChild(script);
+
+            // 添加 Mermaid 支持脚本
+            const mermaidJsPath = currentHref.includes('github.io')
+                ? '/DeepracticeRecode/js/mermaid-support.js'
+                : '../../js/mermaid-support.js';
+
+            const mermaidScript = document.createElement('script');
+            mermaidScript.src = mermaidJsPath;
+            document.body.appendChild(mermaidScript);
+
+            console.log('📤 JavaScript文件已动态加载:', jsPath);
+            console.log('📤 Mermaid支持脚本已加载:', mermaidJsPath);
+        })();
+    </script>
+</body>
+</html>

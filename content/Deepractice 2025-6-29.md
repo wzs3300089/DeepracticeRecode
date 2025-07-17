@@ -1,4 +1,4 @@
-# 深度实践直播笔记 (2025-06-29)
+# 深度实践 ｜ 2025 年 6 月 29 日直播回放 ｜ PromptX 鲁班 ｜ AI软件工程 ｜ Deepractice OES 任务规划
 
 ## 目录
 - [PromptX 鲁班工具演示](#promptx-鲁班工具演示-content-05:22)

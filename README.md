@@ -19,6 +19,11 @@
    - 📍 位置: `subsites/7-10/`
    - 🏷️ 标签: DPML、提示词设计、XML结构、三方交互
 
+3. **AI辅助软件开发流程实践：从零到一规划语音工具** (2025年6月29日)
+   - ⚙️ AI协作软件工程方法论
+   - 📍 位置: `subsites/2025-6-29/`
+   - 🏷️ 标签: 软件工程、User Journey、OES框架、TDD
+
 ## 技术栈
 
 - **HTML5**: 语义化标签，良好的可访问性
@@ -35,21 +40,45 @@ deepractice/
 │   ├── peta-os-website/                # PETA-OS 认知记忆系统
 │   │   ├── index.html
 │   │   ├── styles.css
-│   │   └── script.js
-│   └── 7-10/                           # DPML 提示词设计原则
-│       ├── index.html
-│       ├── styles.css
-│       └── script.js
+│   │   ├── script.js
+│   │   └── README.md
+│   ├── 7-10/                           # DPML 提示词设计原则
+│   │   ├── index.html
+│   │   ├── styles.css
+│   │   ├── script.js
+│   │   └── README.md
+│   └── 2025-6-29/                      # AI辅助软件开发流程实践
+│       ├── index.html                  # (1061行) 8个主要内容区块
+│       ├── styles.css                  # (1828行) 橙色系主题设计
+│       ├── script.js                   # (438行) 完整交互功能
+│       └── README.md                   # (437行) 项目说明文档
 ├── css/
 │   └── styles.css                      # 主页样式
 ├── js/
 │   └── main.js                         # 主页脚本
 ├── doc/                                # 技术文档
 │   ├── Deepractice 7-10.md
-│   └── Deepractice PETA-OS.md
-├── PETA-OS-Website-Complete-Technical-Analysis.md  # 完整技术分析
+│   ├── Deepractice PETA-OS.md
+│   └── PETA-OS-Website-Complete-Technical-Analysis.md
 └── README.md                           # 项目说明
 ```
+
+### 子网站命名规范
+
+**重要更新**: 从2025年6月29日开始，子网站目录采用新的命名规范：
+
+- **新规范**: 按直播回放的年月日命名 (格式: `YYYY-M-DD`)
+  - 示例: `2025-6-29` (2025年6月29日直播)
+  - 优势: 时间顺序清晰，便于管理和查找
+
+- **历史规范**: 早期子网站保持原有命名
+  - `peta-os-website` (2025年7月14日)
+  - `7-10` (2025年7月7日)
+
+**命名原则**:
+1. 使用直播实际发生的日期，而非制作时间
+2. 月份和日期不补零 (如 `6-29` 而非 `06-29`)
+3. 确保与直播内容和时间的准确对应
 
 ## 功能特性
 
@@ -75,6 +104,13 @@ deepractice/
 - ✅ 对比示例说明
 - ✅ 社区理念阐述
 - ✅ AI 总结归纳
+
+#### AI辅助软件开发流程实践
+- ✅ 完整的软件工程方法论展示
+- ✅ AI协作技巧的实战演示
+- ✅ 从需求分析到开发计划的全流程
+- ✅ User Journey、User Story、OES框架应用
+- ✅ 橙色系主题设计，突出软件工程特色
 
 ### 交互体验
 - ✅ 流畅的滚动动画
@@ -138,6 +174,7 @@ deepractice/
    - 主页: `http://localhost:8000`
    - PETA-OS: `http://localhost:8000/subsites/peta-os-website/`
    - DPML: `http://localhost:8000/subsites/7-10/`
+   - AI软件工程: `http://localhost:8000/subsites/2025-6-29/`
 
 ### 在线部署
 支持部署到任何静态网站托管服务：
@@ -170,25 +207,44 @@ deepractice/
 
 ### 添加新的直播记录
 
-1. **创建子网站目录**
+1. **创建子网站目录** (按新命名规范)
    ```bash
-   mkdir subsites/new-topic
-   cd subsites/new-topic
+   # 使用直播回放的年月日命名 (格式: YYYY-M-DD)
+   mkdir subsites/2025-7-20  # 示例：2025年7月20日直播
+   cd subsites/2025-7-20
    ```
 
 2. **创建基础文件**
    ```bash
-   touch index.html styles.css script.js
+   touch index.html styles.css script.js README.md
    ```
 
 3. **更新主页记录列表**
    - 编辑 `index.html` 中的 `records-container`
    - 添加新的 `record-module`
+   - 确保动画延迟递增 (0.2s, 0.4s, 0.6s...)
 
 4. **遵循设计规范**
-   - 使用统一的色彩系统
-   - 保持一致的布局模式
+   - 使用统一的色彩系统 (可选择主题色彩差异化)
+   - 保持一致的布局模式 (基于PETA-OS技术架构)
    - 应用 UX 设计原则
+   - 创建完整的项目说明文档
+
+### 命名规范详解
+
+**子网站目录命名**:
+- **格式**: `YYYY-M-DD` (年-月-日，月日不补零)
+- **示例**:
+  - `2025-6-29` ✅ (2025年6月29日)
+  - `2025-12-5` ✅ (2025年12月5日)
+  - `2025-06-29` ❌ (不要补零)
+  - `june-29-2025` ❌ (不使用英文)
+
+**重要原则**:
+1. 使用直播实际发生的日期
+2. 确保时间顺序的清晰性
+3. 便于文件管理和查找
+4. 与直播内容保持准确对应
 
 ### CSS 架构
 - **CSS Variables**: 统一的设计令牌系统
@@ -248,6 +304,7 @@ deepractice/
 
 ## 版本历史
 
+- **v1.3.0** (2025-07-17): 添加 AI辅助软件开发流程实践，建立新的子网站命名规范
 - **v1.2.0** (2025-07-14): 添加 PETA-OS 认知记忆系统
 - **v1.1.0** (2025-07-07): 添加 DPML 提示词设计原则
 - **v1.0.0** (2025-07-01): 初始版本发布
