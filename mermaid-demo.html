@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mermaid 图表演示 - Deepractice</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/mermaid-theme.css">
+    <style>
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .demo-section {
+            margin-bottom: 3rem;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .demo-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #7c3aed;
+            padding-bottom: 0.5rem;
+        }
+        .demo-description {
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        .code-block {
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+        }
+        .header {
+            background: linear-gradient(135deg, #7c3aed, #3b82f6);
+            color: white;
+            text-align: center;
+            padding: 3rem 2rem;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .header p {
+            font-size: 1.125rem;
+            opacity: 0.9;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #7c3aed;
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+        .back-btn:hover {
+            background: #5b21b6;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎨 Mermaid 图表演示</h1>
+        <p>Deepractice 项目中的 Mermaid 图表支持展示</p>
+    </div>
+
+    <div class="demo-container">
+        <a href="index.html" class="back-btn">
+            ← 返回主页
+        </a>
+
+        <!-- 流程图演示 -->
+        <div class="demo-section">
+            <h2 class="demo-title">1. 流程图 (Flowchart)</h2>
+            <p class="demo-description">展示 DPML 设计原则的决策流程</p>
+            
+            <div class="mermaid">
+flowchart TD
+    A[开始设计提示词] --> B{是否需要结构化?}
+    B -->|是| C[使用XML标签结构]
+    B -->|否| D[使用自然语言]
+    C --> E{是否使用共识词汇?}
+    E -->|是| F[选择广泛理解的概念]
+    E -->|否| G[创造新术语]
+    F --> H{是否约而不束?}
+    G --> H
+    H -->|是| I[✅ 优秀的DPML设计]
+    H -->|否| J[❌ 过度束缚]
+    D --> K[传统提示词]
+    I --> L[AI理解准确]
+    J --> M[AI理解困难]
+    K --> N[效果一般]
+            </div>
+
+            <div class="code-block">
+flowchart TD
+    A[开始设计提示词] --> B{是否需要结构化?}
+    B -->|是| C[使用XML标签结构]
+    B -->|否| D[使用自然语言]
+    C --> E{是否使用共识词汇?}
+    E -->|是| F[选择广泛理解的概念]
+    E -->|否| G[创造新术语]
+    F --> H{是否约而不束?}
+    G --> H
+    H -->|是| I[✅ 优秀的DPML设计]
+    H -->|否| J[❌ 过度束缚]
+            </div>
+        </div>
+
+        <!-- 序列图演示 -->
+        <div class="demo-section">
+            <h2 class="demo-title">2. 序列图 (Sequence Diagram)</h2>
+            <p class="demo-description">展示 PETA-OS 认知记忆系统的交互流程</p>
+            
+            <div class="mermaid">
+sequenceDiagram
+    participant U as 用户
+    participant A as AI Agent
+    participant M as 记忆系统
+    participant C as 认知引擎
+    
+    U->>A: 发送问题
+    A->>M: 检索相关记忆
+    M-->>A: 返回记忆片段
+    A->>C: 启动认知推理
+    C->>C: 思维链处理
+    C-->>A: 生成洞察
+    A->>M: 存储新记忆
+    A-->>U: 返回答案
+    
+    Note over M,C: PETA-OS 核心架构
+            </div>
+        </div>
+
+        <!-- 甘特图演示 -->
+        <div class="demo-section">
+            <h2 class="demo-title">3. 甘特图 (Gantt Chart)</h2>
+            <p class="demo-description">Deepractice 项目开发时间线</p>
+            
+            <div class="mermaid">
+gantt
+    title Deepractice 项目开发时间线
+    dateFormat  YYYY-MM-DD
+    section 设计阶段
+    需求分析          :done,    req, 2025-06-01, 2025-06-15
+    架构设计          :done,    arch, 2025-06-10, 2025-06-25
+    UI/UX设计         :done,    ui, 2025-06-20, 2025-07-05
+    section 开发阶段
+    PETA-OS开发       :active,  peta, 2025-07-01, 2025-07-14
+    DPML开发          :done,    dpml, 2025-07-01, 2025-07-07
+    主站开发          :done,    main, 2025-07-05, 2025-07-10
+    section 优化阶段
+    UX优化            :         ux, 2025-07-15, 2025-07-20
+    性能优化          :         perf, 2025-07-18, 2025-07-25
+    文档完善          :         doc, 2025-07-20, 2025-07-30
+            </div>
+        </div>
+
+        <!-- 思维导图演示 -->
+        <div class="demo-section">
+            <h2 class="demo-title">4. 思维导图 (Mindmap)</h2>
+            <p class="demo-description">Deepractice 技术体系概览</p>
+            
+            <div class="mermaid">
+mindmap
+  root((Deepractice))
+    PETA-OS
+      认知架构
+        记忆编码
+        记忆检索
+        记忆巩固
+      状态引擎
+        思维链
+        推理模式
+        决策树
+      心理学模型
+        认知负荷
+        记忆模式
+        学习理论
+    DPML
+      结构化
+        XML标签
+        模块化
+        层次化
+      基于共识
+        文化共识
+        技术共识
+        语言共识
+      约而不束
+        灵活性
+        可扩展性
+        适应性
+    技术栈
+      前端
+        HTML5
+        CSS3
+        JavaScript
+      设计
+        响应式
+        UX优化
+        主题系统
+      工具
+        Mermaid
+        Git
+        GitHub Pages
+            </div>
+        </div>
+
+        <!-- 饼图演示 -->
+        <div class="demo-section">
+            <h2 class="demo-title">5. 饼图 (Pie Chart)</h2>
+            <p class="demo-description">项目技术栈分布</p>
+            
+            <div class="mermaid">
+pie title 技术栈分布
+    "HTML/CSS" : 35
+    "JavaScript" : 30
+    "设计/UX" : 20
+    "文档" : 10
+    "其他" : 5
+            </div>
+        </div>
+
+        <!-- 状态图演示 -->
+        <div class="demo-section">
+            <h2 class="demo-title">6. 状态图 (State Diagram)</h2>
+            <p class="demo-description">AI Agent 的状态转换</p>
+            
+            <div class="mermaid">
+stateDiagram-v2
+    [*] --> 待机
+    待机 --> 接收输入 : 用户输入
+    接收输入 --> 记忆检索 : 开始处理
+    记忆检索 --> 认知推理 : 找到相关记忆
+    记忆检索 --> 学习模式 : 无相关记忆
+    认知推理 --> 生成回答 : 推理完成
+    学习模式 --> 生成回答 : 学习完成
+    生成回答 --> 记忆存储 : 存储新知识
+    记忆存储 --> 待机 : 完成处理
+    
+    note right of 认知推理 : PETA-OS 核心
+    note left of 学习模式 : 持续学习能力
+            </div>
+        </div>
+
+        <!-- 使用说明 -->
+        <div class="demo-section">
+            <h2 class="demo-title">📖 使用说明</h2>
+            <div class="demo-description">
+                <h3>如何在项目中使用 Mermaid：</h3>
+                <ol>
+                    <li><strong>引入文件：</strong>确保页面包含 <code>mermaid-theme.css</code> 和 <code>mermaid-support.js</code></li>
+                    <li><strong>HTML 标记：</strong>使用 <code>&lt;div class="mermaid"&gt;图表代码&lt;/div&gt;</code></li>
+                    <li><strong>自动初始化：</strong>页面加载时会自动检测并渲染图表</li>
+                    <li><strong>手动控制：</strong>使用 JavaScript API 进行动态操作</li>
+                </ol>
+                
+                <h3>JavaScript API：</h3>
+                <div class="code-block">
+// 初始化 Mermaid
+await initMermaid();
+
+// 动态添加图表
+await addMermaidChart('#container', 'graph TD\n A --> B');
+
+// 渲染特定元素
+await renderMermaidChart('.my-chart');
+                </div>
+                
+                <p><strong>详细文档：</strong>请参考 <a href="doc/Mermaid-Integration-Guide.md">Mermaid 集成指南</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/mermaid-support.js"></script>
+    <script>
+        // 页面加载完成后初始化 Mermaid
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('开始初始化 Mermaid...');
+            const success = await initMermaid({
+                theme: 'default',
+                startOnLoad: false
+            });
+            
+            if (success) {
+                console.log('✅ Mermaid 初始化成功');
+            } else {
+                console.error('❌ Mermaid 初始化失败');
+            }
+        });
+    </script>
+</body>
+</html>

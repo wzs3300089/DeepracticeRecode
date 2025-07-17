@@ -1,0 +1,345 @@
+/**
+ * Deepractice Mermaid 主题样式
+ * 为 Mermaid 图表提供统一的视觉风格
+ */
+
+/* Mermaid 容器基础样式 */
+.mermaid-container {
+    width: 100%;
+    text-align: center;
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    overflow-x: auto;
+    transition: all 0.3s ease;
+}
+
+.mermaid-container:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Mermaid 原始元素样式 */
+.mermaid {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin: 1rem 0;
+}
+
+/* SVG 响应式样式 */
+.mermaid-container svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+/* 错误显示样式 */
+.mermaid-error {
+    padding: 1rem;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    color: #dc2626;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.875rem;
+    text-align: left;
+    margin: 1rem 0;
+}
+
+.mermaid-error strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+/* 加载状态样式 */
+.mermaid-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.mermaid-loading::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e5e7eb;
+    border-top: 2px solid #7c3aed;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 0.5rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 深色主题支持 */
+[data-theme="dark"] .mermaid-container {
+    background: #1f2937;
+    border-color: #374151;
+    color: #f9fafb;
+}
+
+[data-theme="dark"] .mermaid-error {
+    background: #7f1d1d;
+    border-color: #dc2626;
+    color: #fecaca;
+}
+
+/* 流程图特定样式 */
+.mermaid-container .flowchart-link {
+    stroke: #7c3aed;
+    stroke-width: 2px;
+}
+
+.mermaid-container .node rect,
+.mermaid-container .node circle,
+.mermaid-container .node polygon {
+    fill: #ffffff;
+    stroke: #7c3aed;
+    stroke-width: 2px;
+}
+
+.mermaid-container .node .label {
+    color: #1f2937;
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* 序列图特定样式 */
+.mermaid-container .actor {
+    fill: #7c3aed;
+    stroke: #5b21b6;
+}
+
+.mermaid-container .actor-line {
+    stroke: #d1d5db;
+    stroke-width: 1px;
+    stroke-dasharray: 3,3;
+}
+
+.mermaid-container .messageLine0,
+.mermaid-container .messageLine1 {
+    stroke: #7c3aed;
+    stroke-width: 2px;
+}
+
+.mermaid-container .messageText {
+    fill: #1f2937;
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+}
+
+/* 甘特图特定样式 */
+.mermaid-container .grid .tick {
+    stroke: #e5e7eb;
+    stroke-width: 1px;
+}
+
+.mermaid-container .grid path {
+    stroke-width: 0;
+}
+
+.mermaid-container .today {
+    fill: #dc2626;
+    stroke: #dc2626;
+    stroke-width: 2px;
+}
+
+/* 饼图特定样式 */
+.mermaid-container .pieCircle {
+    stroke: #ffffff;
+    stroke-width: 2px;
+}
+
+.mermaid-container .pieTitleText {
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    fill: #1f2937;
+}
+
+/* 状态图特定样式 */
+.mermaid-container .state-start,
+.mermaid-container .state-end {
+    fill: #7c3aed;
+    stroke: #5b21b6;
+}
+
+.mermaid-container .state-note {
+    fill: #fef3c7;
+    stroke: #f59e0b;
+}
+
+/* 类图特定样式 */
+.mermaid-container .classBox {
+    fill: #ffffff;
+    stroke: #7c3aed;
+    stroke-width: 2px;
+}
+
+.mermaid-container .classTitle {
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .mermaid-container {
+        margin: 1rem 0;
+        padding: 1rem;
+        border-radius: 8px;
+    }
+    
+    .mermaid-container svg {
+        font-size: 12px;
+    }
+    
+    .mermaid-container .node .label {
+        font-size: 12px;
+    }
+    
+    .mermaid-container .messageText {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mermaid-container {
+        margin: 0.5rem 0;
+        padding: 0.75rem;
+    }
+    
+    .mermaid-container svg {
+        font-size: 10px;
+    }
+}
+
+/* 打印样式 */
+@media print {
+    .mermaid-container {
+        box-shadow: none;
+        border: 1px solid #000000;
+        background: #ffffff;
+        break-inside: avoid;
+    }
+    
+    .mermaid-container svg {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+    .mermaid-container {
+        border-width: 2px;
+        border-color: #000000;
+    }
+    
+    .mermaid-container .node rect,
+    .mermaid-container .node circle,
+    .mermaid-container .node polygon {
+        stroke-width: 3px;
+        stroke: #000000;
+    }
+    
+    .mermaid-container .flowchart-link {
+        stroke: #000000;
+        stroke-width: 3px;
+    }
+}
+
+/* 减少动画模式支持 */
+@media (prefers-reduced-motion: reduce) {
+    .mermaid-container {
+        transition: none;
+    }
+    
+    .mermaid-container:hover {
+        transform: none;
+    }
+    
+    .mermaid-loading::before {
+        animation: none;
+    }
+}
+
+/* 工具提示样式 */
+.mermaid-tooltip {
+    position: absolute;
+    background: #1f2937;
+    color: #ffffff;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.mermaid-tooltip.show {
+    opacity: 1;
+}
+
+/* 全屏模式样式 */
+.mermaid-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.mermaid-fullscreen .mermaid-container {
+    max-width: 90vw;
+    max-height: 90vh;
+    margin: 0;
+    background: #ffffff;
+    overflow: auto;
+}
+
+.mermaid-fullscreen-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #ffffff;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    color: #1f2937;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.mermaid-fullscreen-close:hover {
+    background: #f3f4f6;
+    transform: scale(1.1);
+}

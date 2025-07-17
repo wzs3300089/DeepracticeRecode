@@ -67,6 +67,18 @@
             document.head.appendChild(link);
             console.log('📤 CSS链接已添加到页面');
 
+            // 添加 Mermaid 主题 CSS
+            const mermaidCssPath = currentHref.includes('github.io')
+                ? '/DeepracticeRecode/css/mermaid-theme.css'
+                : '../../css/mermaid-theme.css';
+
+            const mermaidLink = document.createElement('link');
+            mermaidLink.rel = 'stylesheet';
+            mermaidLink.href = mermaidCssPath;
+            mermaidLink.id = 'mermaid-theme';
+            document.head.appendChild(mermaidLink);
+            console.log('📤 Mermaid主题CSS已添加:', mermaidCssPath);
+
             // 监控所有CSS请求
             const observer = new MutationObserver(function(mutations) {
                 mutations.forEach(function(mutation) {
@@ -1132,7 +1144,17 @@ personality: helpful</code></pre>
             script.src = jsPath;
             document.body.appendChild(script);
 
+            // 添加 Mermaid 支持脚本
+            const mermaidJsPath = currentHref.includes('github.io')
+                ? '/DeepracticeRecode/js/mermaid-support.js'
+                : '../../js/mermaid-support.js';
+
+            const mermaidScript = document.createElement('script');
+            mermaidScript.src = mermaidJsPath;
+            document.body.appendChild(mermaidScript);
+
             console.log('JS path:', jsPath);
+            console.log('Mermaid JS path:', mermaidJsPath);
         })();
     </script>
 </body>
