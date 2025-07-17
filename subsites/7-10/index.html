@@ -1007,11 +1007,13 @@ personality: helpful</code></pre>
                             <p><strong>Mermaid</strong> 也是"约而不束"的典范。它有简单的语法（约），但能生成丰富的可视化图表，同时被人类、计算机和 AI 很好地理解。</p>
                             <div class="mermaid-example">
                                 <h4>Mermaid 示例：</h4>
-                                <pre><code>graph TD
+                                <div class="mermaid">
+graph TD
     A[开始] --> B{是否理解?}
     B -->|是| C[继续学习]
     B -->|否| D[重新阅读]
-    D --> B</code></pre>
+    D --> B
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1151,6 +1153,21 @@ personality: helpful</code></pre>
 
             const mermaidScript = document.createElement('script');
             mermaidScript.src = mermaidJsPath;
+            mermaidScript.onload = function() {
+                console.log('✅ Mermaid脚本加载完成，开始初始化...');
+                // 等待一小段时间确保脚本完全加载
+                setTimeout(() => {
+                    if (window.initMermaid) {
+                        window.initMermaid().then(() => {
+                            console.log('✅ Mermaid初始化成功');
+                        }).catch(error => {
+                            console.error('❌ Mermaid初始化失败:', error);
+                        });
+                    } else {
+                        console.warn('⚠️ Mermaid初始化函数未找到');
+                    }
+                }, 100);
+            };
             document.body.appendChild(mermaidScript);
 
             console.log('JS path:', jsPath);

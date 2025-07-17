@@ -1457,6 +1457,21 @@
 
             const mermaidScript = document.createElement('script');
             mermaidScript.src = mermaidJsPath;
+            mermaidScript.onload = function() {
+                console.log('✅ Mermaid脚本加载完成，开始初始化...');
+                // 等待一小段时间确保脚本完全加载
+                setTimeout(() => {
+                    if (window.initMermaid) {
+                        window.initMermaid().then(() => {
+                            console.log('✅ Mermaid初始化成功');
+                        }).catch(error => {
+                            console.error('❌ Mermaid初始化失败:', error);
+                        });
+                    } else {
+                        console.warn('⚠️ Mermaid初始化函数未找到');
+                    }
+                }, 100);
+            };
             document.body.appendChild(mermaidScript);
 
             // 调试信息
