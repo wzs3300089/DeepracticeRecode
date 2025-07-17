@@ -38,6 +38,21 @@
     margin: 0 auto;
 }
 
+/* 小尺寸图表样式 */
+.mermaid-small .mermaid-container svg,
+.mermaid-example .mermaid-container svg {
+    transform: scale(0.25);
+    transform-origin: center;
+}
+
+.mermaid-small .mermaid-container,
+.mermaid-example .mermaid-container {
+    min-height: 60px;
+    padding: 1rem;
+}
+
+
+
 /* 错误显示样式 */
 .mermaid-error {
     padding: 1rem;
