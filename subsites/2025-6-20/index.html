@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptX | 提示词优化技巧和设计原则 - Deepractice 2025年6月20日直播</title>
+    <meta name="description" content="基于2025年6月20日直播回放，深入探讨提示词优化的核心原则、设计模式和工程化实践，包含元提示词、奥卡姆剃刀、抽象与模式、女娲系统等前沿技术。">
+    <meta name="keywords" content="PromptX,提示词优化,元提示词,奥卡姆剃刀,抽象模式,女娲系统,DSL,AI工程化">
+    <meta name="author" content="Deepractice">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="PromptX | 提示词优化技巧和设计原则 - Deepractice">
+    <meta property="og:description" content="深入探讨提示词优化的核心原则、设计模式和工程化实践">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#06b6d4">
+    <script>
+        // 动态设置正确的CSS路径
+        (function() {
+            // 首先清除任何可能存在的错误CSS链接
+            const existingLinks = document.querySelectorAll('link[rel="stylesheet"]');
+            existingLinks.forEach(link => {
+                if (link.href.includes('styles.css') && !link.href.includes('/subsites/2025-6-20/')) {
+                    console.warn('移除错误的CSS链接:', link.href);
+                    link.remove();
+                }
+            });
+
+            const currentHref = window.location.href;
+            const currentPath = window.location.pathname;
+
+            // 调试信息
+            console.log('Current href:', currentHref);
+            console.log('Current path:', currentPath);
+            console.log('Document location:', document.location);
+            console.log('Base URI:', document.baseURI);
+
+            // 智能路径检测 - 支持本地开发和GitHub Pages部署
+            let cssPath;
+            if (currentHref.includes('github.io')) {
+                // GitHub Pages部署环境
+                cssPath = '/DeepracticeRecode/subsites/2025-6-20/styles.css';
+            } else if (currentPath.includes('/subsites/2025-6-20/')) {
+                // 本地开发或直接访问subsites目录
+                cssPath = './styles.css';
+            } else {
+                // 从根目录访问
+                cssPath = '/subsites/2025-6-20/styles.css';
+            }
+
+            console.log('CSS Path:', cssPath);
+            console.log('Full CSS URL will be:', new URL(cssPath, document.baseURI).href);
+
+            // 确保没有重复的CSS链接
+            const existingMainStyles = document.getElementById('main-styles');
+            if (existingMainStyles) {
+                existingMainStyles.remove();
+                console.log('移除已存在的main-styles链接');
+            }
+
+            // 动态创建CSS链接
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = cssPath;
+            link.id = 'main-styles';
+
+            // 添加加载状态监控
+            link.onload = function() {
+                console.log('✅ CSS加载成功:', cssPath);
+            };
+
+            link.onerror = function() {
+                console.error('❌ CSS加载失败:', cssPath);
+                console.error('尝试的完整URL:', new URL(cssPath, document.baseURI).href);
+            };
+
+            document.head.appendChild(link);
+            console.log('📤 CSS链接已添加到页面');
+
+            // 添加 Mermaid 主题 CSS
+            const mermaidCssPath = currentHref.includes('github.io')
+                ? '/DeepracticeRecode/css/mermaid-theme.css'
+                : '../../css/mermaid-theme.css';
+
+            const mermaidLink = document.createElement('link');
+            mermaidLink.rel = 'stylesheet';
+            mermaidLink.href = mermaidCssPath;
+            mermaidLink.id = 'mermaid-theme';
+            document.head.appendChild(mermaidLink);
+            console.log('📤 Mermaid主题CSS已添加:', mermaidCssPath);
+
+            // 监控所有CSS请求
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'childList') {
+                        mutation.addedNodes.forEach(function(node) {
+                            if (node.tagName === 'LINK' && node.rel === 'stylesheet') {
+                                console.log('🔍 检测到新的CSS链接:', node.href);
+                                if (node.href.includes('styles.css') && !node.href.includes('/subsites/2025-6-20/')) {
+                                    console.error('🚫 阻止错误的CSS请求:', node.href);
+                                    node.remove();
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+            observer.observe(document.head, { childList: true, subtree: true });
+
+            // 返回首页函数
+            window.goBackHome = function() {
+                const currentHref = window.location.href;
+                if (currentHref.includes('github.io')) {
+                    window.location.href = '/DeepracticeRecode/';
+                } else {
+                    window.location.href = '../../index.html';
+                }
+            };
+        })();
+    </script>
+
+    <!-- 全局函数定义 -->
+    <script>
+        // 紧急备用的toggleSidebar函数
+        window.emergencyToggleSidebar = function() {
+            console.log('🚨 紧急备用toggleSidebar被调用');
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                const isMobile = window.innerWidth <= 1024;
+
+                if (isMobile) {
+                    // 移动端：直接控制transform
+                    const currentTransform = window.getComputedStyle(sidebar).transform;
+                    const isHidden = currentTransform.includes('translateX(-') || sidebar.style.transform.includes('translateX(-');
+
+                    if (isHidden) {
+                        sidebar.style.transform = 'translateX(0)';
+                        sidebar.classList.add('active');
+                        console.log('🚨 移动端：显示侧边栏');
+                    } else {
+                        sidebar.style.transform = 'translateX(-100%)';
+                        sidebar.classList.remove('active');
+                        console.log('🚨 移动端：隐藏侧边栏');
+                    }
+                } else {
+                    // PC端：也使用直接transform控制
+                    const currentTransform = window.getComputedStyle(sidebar).transform;
+                    const isHidden = currentTransform.includes('translateX(-') || sidebar.style.transform.includes('translateX(-');
+
+                    if (isHidden) {
+                        sidebar.style.transform = 'translateX(0)';
+                        sidebar.classList.remove('active');
+                        console.log('🚨 PC端：显示侧边栏');
+                    } else {
+                        sidebar.style.transform = 'translateX(-100%)';
+                        sidebar.classList.add('active');
+                        console.log('🚨 PC端：隐藏侧边栏');
+                    }
+                }
+
+                // 调用控制按钮更新函数（如果存在）
+                if (window.updateControlsVisibility) {
+                    window.updateControlsVisibility();
+                } else {
+                    // 简单的控制按钮显示逻辑
+                    const controls = document.querySelector('.sidebar-collapsed-controls');
+                    const mobileBack = document.querySelector('.mobile-back-home');
+
+                    // 统一使用transform检测
+                    const transform = window.getComputedStyle(sidebar).transform;
+                    const isSidebarHidden = transform.includes('translateX(-') || sidebar.style.transform.includes('translateX(-');
+
+                    if (controls) {
+                        controls.style.display = isSidebarHidden ? 'flex' : 'none';
+                    }
+                    if (mobileBack && isMobile) {
+                        mobileBack.style.display = isSidebarHidden ? 'block' : 'none';
+                    }
+
+                    console.log('🚨 紧急更新控制按钮显示:', {isMobile, isSidebarHidden});
+                }
+            }
+        };
+
+        // 立即尝试绑定按钮事件
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const btn = document.getElementById('sidebar-toggle');
+                if (btn && !btn.hasAttribute('data-emergency-bound') && !btn.hasAttribute('data-main-bound')) {
+                    console.log('🚨 主要绑定不存在，应用紧急事件绑定');
+                    btn.addEventListener('click', window.emergencyToggleSidebar);
+                    btn.setAttribute('data-emergency-bound', 'true');
+                } else if (btn && btn.hasAttribute('data-main-bound')) {
+                    console.log('✅ 检测到主要绑定，跳过紧急绑定');
+                }
+            }, 200); // 增加延迟，让主要绑定先执行
+        });
+
+        console.log('📄 HTML内联脚本加载完成');
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 设备区分脚本 -->
+    <script>
+        // 立即根据设备类型设置初始状态
+        (function() {
+            // 等待DOM元素创建
+            setTimeout(function() {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar) {
+                    const isMobile = window.innerWidth <= 1024;
+
+                    if (isMobile) {
+                        // 移动端：强制隐藏
+                        sidebar.style.transform = 'translateX(-100%)';
+                        sidebar.classList.remove('active');
+                        console.log('📱 HTML内联：移动端侧边栏设置为隐藏');
+                    } else {
+                        // PC端：确保显示
+                        sidebar.style.transform = 'translateX(0)';
+                        sidebar.classList.remove('active');
+                        console.log('🖥️ HTML内联：PC端侧边栏设置为显示');
+                    }
+                }
+            }, 10);
+        })();
+    </script>
+
+    <!-- 左侧浮动导航 -->
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-brain"></i>
+                <span>PromptX</span>
+            </div>
+            <button id="sidebar-toggle" class="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="sidebar-content">
+            <!-- 返回首页按钮 -->
+            <div class="back-to-home">
+                <a href="javascript:void(0)" class="back-home-btn" onclick="goBackHome()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>返回首页</span>
+                </a>
+            </div>
+
+            <ul class="nav-menu">
+                <li><a href="javascript:void(0)" class="nav-link active" data-section="hero">
+                    <i class="fas fa-home"></i>概述
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="meta-prompt">
+                    <i class="fas fa-magic"></i>元提示词
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="occam-razor">
+                    <i class="fas fa-cut"></i>奥卡姆剃刀
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="abstraction-pattern">
+                    <i class="fas fa-cubes"></i>抽象与模式
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="four-level">
+                    <i class="fas fa-layer-group"></i>四级抽象
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="nuwa-system">
+                    <i class="fas fa-cogs"></i>女娲系统
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="dsl-graphics">
+                    <i class="fas fa-code"></i>DSL与图形化
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="qa-review">
+                    <i class="fas fa-question-circle"></i>Q&A回顾
+                </a></li>
+                <li><a href="javascript:void(0)" class="nav-link" data-section="ai-summary">
+                    <i class="fas fa-graduation-cap"></i>AI总结
+                </a></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="progress-indicator">
+                <div class="progress-bar" id="reading-progress"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 侧边栏隐藏时的控制按钮 -->
+    <div class="sidebar-collapsed-controls">
+        <button id="sidebar-expand" class="sidebar-expand-btn" title="展开侧边栏">
+            <i class="fas fa-bars"></i>
+        </button>
+        <a href="javascript:void(0)" class="quick-back-btn" title="返回首页" onclick="goBackHome()">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+    <!-- 移动端返回首页浮动按钮 -->
+    <div class="mobile-back-home">
+        <a href="javascript:void(0)" class="mobile-back-btn" title="返回首页" onclick="goBackHome()">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+    <!-- 主内容区域 -->
+    <main class="main-content">
+        <!-- 英雄区域 -->
+        <section id="hero" class="hero-section">
+            <div class="hero-background">
+                <div class="neural-network"></div>
+            </div>
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>提示词工程化</span>
+                </div>
+                <h1 class="hero-title">
+                    <span class="gradient-text">PromptX</span>
+                    <br>提示词优化技巧和设计原则
+                </h1>
+                <p class="hero-subtitle">
+                    从元提示词到工程化实践：探索AI时代提示词设计的核心原理与最佳实践
+                </p>
+                <div class="hero-features">
+                    <div class="feature-item">
+                        <i class="fas fa-brain"></i>
+                        <span>认知原理</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>系统化设计</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-cogs"></i>
+                        <span>工程化实践</span>
+                    </div>
+                </div>
+                <div class="hero-actions">
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" onclick="scrollToSection('meta-prompt')">
+                            <i class="fas fa-play"></i>
+                            开始探索
+                        </button>
+                        <a href="https://www.bilibili.com/video/BV1a2N1zjEmo" target="_blank" class="btn btn-secondary">
+                            <i class="fas fa-video"></i>
+                            直播回放
+                        </a>
+                    </div>
+                    <div class="hero-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>2025年6月20日</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>直播回放</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 元提示词：生成提示词的提示词 -->
+        <section id="meta-prompt" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-magic"></i>
+                    </div>
+                    <h2 class="section-title">元提示词：生成提示词的提示词</h2>
+                    <p class="section-subtitle">构建结构化的提示词生成框架</p>
+                </div>
+
+                <div class="content-grid">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <i class="fas fa-lightbulb"></i>
+                            <h3>核心概念</h3>
+                        </div>
+                        <div class="card-content">
+                            <p>本次分享的核心思想源于一篇定义了提示词（Prompt）设计模式的文章。这篇文章不仅是分享，其本身也是一个可以用来生成高质量提示词的"元提示词"（Meta-Prompt）。</p>
+
+                            <div class="highlight-box">
+                                <h4>作为提示词的文章</h4>
+                                <ul>
+                                    <li><strong>结构化定义</strong>：文章将提示词的构成要素进行了归纳和定义，形成了一套框架</li>
+                                    <li><strong>角色 (Role)</strong>: 定义了角色的要素，缩写为 <code>RP</code> (Role Prompt)</li>
+                                    <li><strong>协议 (Protocol)</strong>: 定义了协议的要素，缩写为 <code>PDP</code> (Protocol Description Prompt)</li>
+                                    <li><strong>其他要素</strong>: 还包括执行规范、任务、测试等</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-header">
+                            <i class="fas fa-code"></i>
+                            <h3>实际应用演示</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="demo-steps">
+                                <div class="step">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <h4>输入指令</h4>
+                                        <p>将文章内容作为上下文，然后输入一个简单的指令：</p>
+                                        <div class="code-block">
+                                            <code>"以 RP 方式为我生成一份 Python 后台开发工程师的角色提示词"</code>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="step">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <h4>AI 输出</h4>
+                                        <p>AI 因为理解了文章中对 <code>RP</code> 的定义，所以能够生成一个结构完整、内容详实的 Python 工程师角色提示词，包含了：</p>
+                                        <ul>
+                                            <li>专业技能</li>
+                                            <li>技术栈</li>
+                                            <li>架构能力</li>
+                                            <li>工程实践（CI/CD）</li>
+                                            <li>交付标准</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="step">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <h4>核心结论</h4>
+                                        <p>提示词的本质就是文字。通过创建一个结构化的、定义清晰的"元提示词"，我们可以用简单的指令高效地生成复杂且专业的特定用途提示词。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 提示词优化核心原则：奥卡姆剃刀 -->
+        <section id="occam-razor" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-cut"></i>
+                    </div>
+                    <h2 class="section-title">提示词优化核心原则：奥卡姆剃刀</h2>
+                    <p class="section-subtitle">追求最小化完整的优化理念</p>
+                </div>
+
+                <div class="content-grid">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <i class="fas fa-balance-scale"></i>
+                            <h3>奥卡姆剃刀原理</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="principle-box">
+                                <div class="principle-quote">
+                                    <i class="fas fa-quote-left"></i>
+                                    <p>"如无必要，勿增实体"</p>
+                                    <small>Entities should not be multiplied without necessity</small>
+                                </div>
+                            </div>
+
+                            <div class="application-section">
+                                <h4>在提示词中的应用</h4>
+                                <p>如果一个词、一句话或一个段落可有可无，对最终效果影响不大，就应该删掉。追求的是"最小化完整"（Minimum Viable Product - MVP）的理念。</p>
+
+                                <div class="highlight-box">
+                                    <p><strong>AI 的理解</strong>：大模型知道并能理解"奥卡姆剃刀"这一哲学原理。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-header">
+                            <i class="fas fa-tools"></i>
+                            <h3>优化演示</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="optimization-demo">
+                                <div class="demo-instruction">
+                                    <h4>优化指令</h4>
+                                    <div class="code-block">
+                                        <code>"请使用奥卡姆剃刀原则帮我优化这段提示词"</code>
+                                    </div>
+                                </div>
+
+                                <div class="demo-result">
+                                    <h4>优化效果</h4>
+                                    <div class="result-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-number">⅔</div>
+                                            <div class="stat-label">冗余内容删除</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-number">MVP</div>
+                                            <div class="stat-label">最小可行性</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-number">✓</div>
+                                            <div class="stat-label">直接可用</div>
+                                        </div>
+                                    </div>
+                                    <p>AI 会大幅精简提示词，去除约三分之二的冗余内容，只保留最核心、最必要的部分，使其达到"最小可行性"，可以直接用于驱动 AI 工作。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 提示词设计的两大基石：抽象与模式 -->
+        <section id="abstraction-pattern" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-cubes"></i>
+                    </div>
+                    <h2 class="section-title">提示词设计的两大基石：抽象与模式</h2>
+                    <p class="section-subtitle">理解元提示词有效性的核心概念</p>
+                </div>
+
+                <div class="content-grid">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <i class="fas fa-layer-group"></i>
+                            <h3>抽象 (Abstraction)</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="definition-box">
+                                <h4>定义</h4>
+                                <p>抽象是一种归纳过程，通过忽略具体细节，提取事物的共同特征和本质，形成一个"概念"。</p>
+                            </div>
+
+                            <div class="examples-section">
+                                <h4>示例</h4>
+                                <div class="example-item">
+                                    <h5>角色提示词的抽象</h5>
+                                    <p>无论什么角色（程序员、客服、老师），其提示词都包含"角色身份"、"专业领域"、"职责"等共同要素。这些要素就是对所有角色进行抽象后得出的。</p>
+                                </div>
+
+                                <div class="example-item">
+                                    <h5>苏格拉底式对话探索</h5>
+                                    <p>通过与 AI 探讨"什么是椅子"，最终得出结论：椅子的本质并非单一的功能或外形，而是我们从无数具体椅子中提取出的"共同特征"所形成的概念。</p>
+                                </div>
+                            </div>
+
+                            <div class="ai-relation">
+                                <h4>与 AI 的关系</h4>
+                                <p>AI 的注意力机制（Attention Mechanism）与人的认知类似，无法同时处理所有信息。抽象能够帮助 AI 抓住关键点，从而根据简单的指令完成复杂任务。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-header">
+                            <i class="fas fa-puzzle-piece"></i>
+                            <h3>模式 (Pattern)</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="definition-box">
+                                <h4>定义</h4>
+                                <p>模式是由多个相关的"抽象"组合而成的、具有指导意义的框架或规则集。它比单一的抽象更结构化，能将 AI 的能力框定在特定方向。</p>
+                            </div>
+
+                            <div class="examples-section">
+                                <h4>示例</h4>
+                                <div class="example-item">
+                                    <h5>角色提示词模式</h5>
+                                    <p>将"角色身份"、"专业领域"、"行为准则"、"能力边界"等一系列抽象要素组合在一起，就形成了一个完整的"角色提示词模式"。</p>
+                                </div>
+
+                                <div class="example-item">
+                                    <h5>生活中的模式</h5>
+                                    <ul>
+                                        <li>软件设计模式</li>
+                                        <li>法律法规</li>
+                                        <li>公司的工作流程</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="warning-section">
+                    <div class="warning-card">
+                        <div class="warning-header">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h3>抽象的层级与陷阱</h3>
+                        </div>
+                        <div class="warning-content">
+                            <div class="warning-item">
+                                <h4>具体问题具体分析</h4>
+                                <p>过度抽象会导致信息丢失，失去实用价值。例如，试图创造一个适用于所有平台的"完美"推文模式，最终会因为过于泛化而无法使用。</p>
+                            </div>
+                            <div class="warning-item">
+                                <h4>实践出真知</h4>
+                                <p>理论需要结合实践，不能脱离具体场景。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 应用框架：从元提示词到产品的四级抽象 -->
+        <section id="four-level" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h2 class="section-title">应用框架：从元提示词到产品的四级抽象</h2>
+                    <p class="section-subtitle">不可跳跃的四层抽象结构</p>
+                </div>
+
+                <div class="framework-visualization">
+                    <div class="level-container">
+                        <div class="level-card level-1">
+                            <div class="level-number">1</div>
+                            <div class="level-content">
+                                <h3>元提示词 (Meta-Prompt)</h3>
+                                <p>最高级别的抽象，用于生成其他提示词的规则和模板。</p>
+                            </div>
+                        </div>
+
+                        <div class="level-arrow">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+
+                        <div class="level-card level-2">
+                            <div class="level-number">2</div>
+                            <div class="level-content">
+                                <h3>领域提示词 (Domain Prompt)</h3>
+                                <p>由元提示词生成的、针对特定领域或角色的提示词（如：Java 工程师、客服专员）。这对应着社会中的"组织"或"公司"。</p>
+                            </div>
+                        </div>
+
+                        <div class="level-arrow">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+
+                        <div class="level-card level-3">
+                            <div class="level-number">3</div>
+                            <div class="level-content">
+                                <h3>项目 (Project)</h3>
+                                <p>在特定领域内，为完成某个业务目标而组织的一系列活动和任务。它是一个概念集合。</p>
+                            </div>
+                        </div>
+
+                        <div class="level-arrow">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+
+                        <div class="level-card level-4">
+                            <div class="level-number">4</div>
+                            <div class="level-content">
+                                <h3>产品 (Product)</h3>
+                                <p>最终交付的、具象化的、可触摸、可使用的实体。例如一个 App、一栋建筑或一门课程。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="framework-note">
+                    <div class="note-card">
+                        <i class="fas fa-info-circle"></i>
+                        <p><strong>重要提示</strong>：在实际应用中，从最高级的概念到最终的实体产品，遵循一个四层抽象的结构。这个过程是不可跳跃的。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- "女娲"系统设计：工程化的提示词框架 -->
+        <section id="nuwa-system" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h2 class="section-title">"女娲"系统设计：工程化的提示词框架</h2>
+                    <p class="section-subtitle">实现提示词的工程化、模块化和复用</p>
+                </div>
+
+                <div class="content-grid">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <i class="fas fa-user-cog"></i>
+                            <h3>核心设计哲学：拟人化</h3>
+                        </div>
+                        <div class="card-content">
+                            <p>框架的设计模仿了人的思维和行为模式，使其更符合直觉且能应对万物。</p>
+
+                            <div class="philosophy-box">
+                                <h4>拟人化优势</h4>
+                                <ul>
+                                    <li>符合人类直觉思维</li>
+                                    <li>易于理解和使用</li>
+                                    <li>具有广泛适用性</li>
+                                    <li>支持复杂场景建模</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-header">
+                            <i class="fas fa-puzzle-piece"></i>
+                            <h3>关键组件：可拔插的模块</h3>
+                        </div>
+                        <div class="card-content">
+                            <p>通过将人的特征拆解为可复用的模块，实现了高度的灵活性。</p>
+
+                            <div class="component-section">
+                                <div class="component-item">
+                                    <div class="component-icon">
+                                        <i class="fas fa-brain"></i>
+                                    </div>
+                                    <div class="component-content">
+                                        <h4>人格 (Personality)</h4>
+                                        <p>定义了<strong>思维模式</strong>的集合</p>
+                                        <div class="examples">
+                                            <span class="tag">探索性思维</span>
+                                            <span class="tag">逻辑推理思维</span>
+                                            <span class="tag">批判性思维</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="component-item">
+                                    <div class="component-icon">
+                                        <i class="fas fa-gavel"></i>
+                                    </div>
+                                    <div class="component-content">
+                                        <h4>原则 (Principle)</h4>
+                                        <p>定义了<strong>行为模式</strong>的集合，即在不同场景下需要遵守的规则</p>
+                                        <div class="examples">
+                                            <span class="tag">作为父亲的原则</span>
+                                            <span class="tag">作为员工的原则</span>
+                                            <span class="tag">作为公民的原则</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="engineering-advantages">
+                    <div class="advantage-card">
+                        <div class="advantage-header">
+                            <i class="fas fa-tools"></i>
+                            <h3>工程化优势：可拔插与复用</h3>
+                        </div>
+                        <div class="advantage-content">
+                            <div class="demo-section">
+                                <h4>实际演示</h4>
+                                <p>通过为一个 Agent 添加一个名为 <code>DACP-email-sending</code> 的行为原则，该 Agent 就获得了发送邮件的能力。移除这个原则，它就失去该能力。</p>
+
+                                <div class="implementation-box">
+                                    <h4>实现方式</h4>
+                                    <p>将不同的思维模式和行为原则制作成独立的提示词模块。在生成新角色时，可以像拼装乐高一样，自由组合这些模块，快速创建一个具备特定能力和性格的新角色。</p>
+                                </div>
+                            </div>
+
+                            <div class="benefits-grid">
+                                <div class="benefit-item">
+                                    <i class="fas fa-rocket"></i>
+                                    <h4>快速组装</h4>
+                                    <p>像乐高积木一样自由组合</p>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-recycle"></i>
+                                    <h4>模块复用</h4>
+                                    <p>一次开发，多次使用</p>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-cog"></i>
+                                    <h4>灵活配置</h4>
+                                    <p>动态添加或移除能力</p>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-expand-arrows-alt"></i>
+                                    <h4>易于扩展</h4>
+                                    <p>支持新模块的无缝集成</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 高级技巧：利用DSL与图形化语法优化提示词 -->
+        <section id="dsl-graphics" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h2 class="section-title">高级技巧：利用DSL与图形化语法优化提示词</h2>
+                    <p class="section-subtitle">让提示词更精准、简洁且节省成本</p>
+                </div>
+
+                <div class="content-grid">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <i class="fas fa-language"></i>
+                            <h3>什么是 DSL (Domain-Specific Language)</h3>
+                        </div>
+                        <div class="card-content">
+                            <p>专为特定领域设计的、表达能力强且简洁的语言。</p>
+
+                            <div class="dsl-examples">
+                                <h4>示例</h4>
+                                <div class="example-grid">
+                                    <div class="example-item">
+                                        <i class="fas fa-calculator"></i>
+                                        <span>数学公式</span>
+                                    </div>
+                                    <div class="example-item">
+                                        <i class="fas fa-code-branch"></i>
+                                        <span>EBNF 范式</span>
+                                    </div>
+                                    <div class="example-item">
+                                        <i class="fas fa-project-diagram"></i>
+                                        <span>Mermaid 流程图</span>
+                                    </div>
+                                    <div class="example-item">
+                                        <i class="fas fa-table"></i>
+                                        <span>表格</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-header">
+                            <i class="fas fa-magic"></i>
+                            <h3>在提示词中的应用</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="application-item">
+                                <h4>1. Mermaid (mindmap)</h4>
+                                <div class="advantage-list">
+                                    <div class="advantage">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span><strong>优势</strong>：能用极少的文本表达复杂的层级和逻辑关系</span>
+                                    </div>
+                                    <div class="advantage">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>既方便人阅读，也极大节省了 Token</span>
+                                    </div>
+                                    <div class="advantage">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>AI 能很好地理解这种结构化信息</span>
+                                    </div>
+                                </div>
+                                <div class="effect-box">
+                                    <p><strong>效果</strong>：用几十个字符的 Mermaid 语法，可以替代数百个字符的纯文本描述，同时表达得更清晰。</p>
+                                </div>
+                            </div>
+
+                            <div class="application-item">
+                                <h4>2. 表格 (Table)</h4>
+                                <div class="advantage-list">
+                                    <div class="advantage">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span><strong>优势</strong>：能清晰地展示不同项目之间的对应关系</span>
+                                    </div>
+                                    <div class="advantage">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>隐含了丰富的结构信息</span>
+                                    </div>
+                                    <div class="advantage">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>同样能起到节省 Token 和精准表达的作用</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nuwa-application">
+                    <div class="application-card">
+                        <div class="application-header">
+                            <i class="fas fa-star"></i>
+                            <h3>"女娲"的应用</h3>
+                        </div>
+                        <div class="application-content">
+                            <p>"女娲"的提示词中大量运用了 Mermaid 和表格来定义其内部工作流程和对外部规则（如 DPM 框架）的理解，使其自身的提示词变得非常高效和精炼。</p>
+
+                            <div class="efficiency-stats">
+                                <div class="stat-item">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-compress-alt"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <h4>Token 节省</h4>
+                                        <p>相比纯文本描述节省60-80%</p>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-bullseye"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <h4>表达精准</h4>
+                                        <p>结构化信息更易理解</p>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-tachometer-alt"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <h4>处理高效</h4>
+                                        <p>AI理解速度显著提升</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Q&A 与核心要点回顾 -->
+        <section id="qa-review" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <h2 class="section-title">Q&A 与核心要点回顾</h2>
+                    <p class="section-subtitle">深入理解关键概念和实践要点</p>
+                </div>
+
+                <div class="qa-grid">
+                    <div class="qa-card">
+                        <div class="qa-header">
+                            <i class="fas fa-robot"></i>
+                            <h3>不同模型对提示词的理解差异</h3>
+                        </div>
+                        <div class="qa-content">
+                            <div class="qa-item">
+                                <h4>存在差异</h4>
+                                <p>不同的大模型（如 Claude vs 其他模型）"智力"水平不同。聪明的模型（如 Claude）能更好地理解抽象和复杂的指令，而其他模型可能需要更明确、更细致的步骤化指令。</p>
+                            </div>
+                            <div class="qa-item">
+                                <h4>核心区别</h4>
+                                <p>这主要是模型能力（特别是代码和逻辑能力）的差异，而非简单的"国内"与"国外"模型的区别。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="qa-card">
+                        <div class="qa-header">
+                            <i class="fas fa-brain"></i>
+                            <h3>Thought (COT) 与 Execution 的区别</h3>
+                        </div>
+                        <div class="qa-content">
+                            <div class="comparison-grid">
+                                <div class="comparison-item">
+                                    <div class="comparison-icon thought">
+                                        <i class="fas fa-lightbulb"></i>
+                                    </div>
+                                    <div class="comparison-content">
+                                        <h4>Thought (思考)</h4>
+                                        <p>指导 AI 内部的思考过程、推理链（Chain of Thought）。这部分内容用户通常不可见，类似于人的"心算"或"构思"。</p>
+                                    </div>
+                                </div>
+
+                                <div class="comparison-item">
+                                    <div class="comparison-icon execution">
+                                        <i class="fas fa-play"></i>
+                                    </div>
+                                    <div class="comparison-content">
+                                        <h4>Execution (执行)</h4>
+                                        <p>指导 AI 最终输出的、可见的行动或结果。例如调用工具、生成代码或回答问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="why-separate">
+                                <h4>为何要区分</h4>
+                                <p>将思考和执行分开，符合拟人化的设计哲学，并能更好地实现模块化和复用。例如，一个计算任务，其"思考"过程是心算，而"执行"过程是调用计算器工具。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI 总结 -->
+        <section id="ai-summary" class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h2 class="section-title">AI 总结</h2>
+                    <p class="section-subtitle">提示词工程化的核心要点与实践指南</p>
+                </div>
+
+                <div class="summary-content">
+                    <div class="summary-card main-summary">
+                        <div class="summary-header">
+                            <i class="fas fa-star"></i>
+                            <h3>核心观点</h3>
+                        </div>
+                        <div class="summary-text">
+                            <p>本次分享深入探讨了高级提示词（Prompt）的设计原则与优化技巧。核心观点是，通过构建"元提示词"（Meta-Prompt）——一种用于生成其他提示词的结构化模板——可以高效地创建专业、复杂的角色提示词。</p>
+                        </div>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <div class="summary-header">
+                                <i class="fas fa-cut"></i>
+                                <h3>优化原则</h3>
+                            </div>
+                            <div class="summary-text">
+                                <p>应用"奥卡姆剃刀"原理，剔除提示词中的冗余信息，追求"最小化完整"，使提示词精炼而高效。</p>
+                            </div>
+                        </div>
+
+                        <div class="summary-card">
+                            <div class="summary-header">
+                                <i class="fas fa-cubes"></i>
+                                <h3>设计框架</h3>
+                            </div>
+                            <div class="summary-text">
+                                <p>基于"抽象"和"模式"两个核心概念。通过对现实世界进行"抽象"（提取共同特征）并将其组合成"模式"（结构化框架），可以有效地指导 AI。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card practice-summary">
+                        <div class="summary-header">
+                            <i class="fas fa-cogs"></i>
+                            <h3>实践层面</h3>
+                        </div>
+                        <div class="summary-text">
+                            <p>分享介绍了"女娲"系统的工程化实现。该系统采用拟人化设计，将提示词拆解为可复用的"人格"（思维模式）和"原则"（行为模式）模块，实现了提示词的"可拔插"组装。</p>
+                        </div>
+                    </div>
+
+                    <div class="summary-card advanced-summary">
+                        <div class="summary-header">
+                            <i class="fas fa-code"></i>
+                            <h3>高级技巧</h3>
+                        </div>
+                        <div class="summary-text">
+                            <p>强调了使用 DSL（如 Mermaid 图、表格）等高级技巧，能以更少的 Token 精准表达复杂逻辑，是优化提示词的重要手段。</p>
+                        </div>
+                    </div>
+
+                    <div class="summary-card goal-summary">
+                        <div class="summary-header">
+                            <i class="fas fa-target"></i>
+                            <h3>最终目标</h3>
+                        </div>
+                        <div class="summary-text">
+                            <p>这些理论和技巧旨在构建一个可维护、可扩展且高效的提示词工程体系。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="key-takeaways">
+                    <div class="takeaway-header">
+                        <i class="fas fa-key"></i>
+                        <h3>关键要点</h3>
+                    </div>
+                    <div class="takeaway-grid">
+                        <div class="takeaway-item">
+                            <i class="fas fa-magic"></i>
+                            <span>元提示词是生成高质量提示词的核心工具</span>
+                        </div>
+                        <div class="takeaway-item">
+                            <i class="fas fa-cut"></i>
+                            <span>奥卡姆剃刀原则确保提示词的精炼性</span>
+                        </div>
+                        <div class="takeaway-item">
+                            <i class="fas fa-layer-group"></i>
+                            <span>四级抽象框架提供系统化的应用路径</span>
+                        </div>
+                        <div class="takeaway-item">
+                            <i class="fas fa-puzzle-piece"></i>
+                            <span>模块化设计实现提示词的工程化复用</span>
+                        </div>
+                        <div class="takeaway-item">
+                            <i class="fas fa-code"></i>
+                            <span>DSL语法大幅提升表达效率和精准度</span>
+                        </div>
+                        <div class="takeaway-item">
+                            <i class="fas fa-brain"></i>
+                            <span>拟人化设计使AI行为更加自然和可控</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 动态加载JavaScript -->
+    <script>
+        // 动态加载JavaScript文件
+        (function() {
+            const currentHref = window.location.href;
+            const currentPath = window.location.pathname;
+
+            // 智能路径检测
+            let jsPath;
+            if (currentHref.includes('github.io')) {
+                jsPath = '/DeepracticeRecode/subsites/2025-6-20/script.js';
+            } else if (currentPath.includes('/subsites/2025-6-20/')) {
+                jsPath = './script.js';
+            } else {
+                jsPath = '/subsites/2025-6-20/script.js';
+            }
+
+            console.log('JavaScript Path:', jsPath);
+
+            // 动态创建script标签
+            const script = document.createElement('script');
+            script.src = jsPath;
+            script.onload = function() {
+                console.log('✅ JavaScript加载成功:', jsPath);
+            };
+            script.onerror = function() {
+                console.error('❌ JavaScript加载失败:', jsPath);
+            };
+            document.body.appendChild(script);
+        })();
+    </script>
+</body>
+</html>
