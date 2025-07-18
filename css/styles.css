@@ -803,11 +803,12 @@ body {
   margin-bottom: 3rem;
 }
 
-/* Records Container - 支持多个记录模块 */
+/* Records Container - 网格卡片布局 */
 .records-container {
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
 }
 
 .record-module {
@@ -828,16 +829,33 @@ body {
   animation-delay: 0.6s;
 }
 
+/* 响应式调整 */
+@media (max-width: 1200px) {
+  .records-container {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .records-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
 .featured-card {
   position: relative;
   overflow: hidden;
   border-radius: 1.5rem;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-bottom: 2rem;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .featured-card:hover {
@@ -859,21 +877,15 @@ body {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-}
-
-@media (min-width: 768px) {
-  .featured-card-content {
-    flex-direction: row;
-    align-items: center;
-  }
+  height: 100%;
 }
 
 .featured-card-main {
   flex: 1;
-  padding: 1rem 1.5rem;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .featured-card-action {
@@ -881,7 +893,8 @@ body {
   align-items: center;
   justify-content: center;
   padding: 1rem 1.5rem;
-  border-left: 1px solid rgba(0, 0, 0, 0.05);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  margin-top: auto;
   min-width: 160px;
   flex-shrink: 0;
 }
@@ -949,12 +962,16 @@ body {
 }
 
 .featured-title {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 700;
   color: #111827;
   margin-bottom: 0.75rem;
   transition: all 0.3s;
   line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .featured-card:hover .featured-title {
@@ -977,6 +994,7 @@ body {
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 0;
+  margin-top: auto;
 }
 
 .featured-meta {
